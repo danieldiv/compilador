@@ -1,0 +1,2 @@
+string strInvalida = "est!!@¡×¥»¬«öóíúüþ®éååäáßðø¶¶´´¿ççµñ©æææ#$%^^&¹²e e¡²³¤€¼½¾¥ o meu testo";
+string strValida = "#include <iostream>";

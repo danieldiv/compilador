@@ -1,0 +1,4 @@
+para compilar, esteja na pasta atv1 e execute o comando
+
+g++ -lm -o main main.cpp %% ./main
+
