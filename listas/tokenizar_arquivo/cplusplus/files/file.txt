@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include "teste.h"
 
-int main(void) {
-	int a=5;
-	int b=a;
+int main (void){
+	int a = 5;
+	int b = a;
 	float c = a+b;
 	float d = b/a;
 	float e = c*d;

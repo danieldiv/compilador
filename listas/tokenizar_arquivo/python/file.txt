@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+int main (void){
+	int a = 5;
+	int b = a;
+	float c = a+b;
+	float d = b/a;
+	float e = c*d;
+	float f = e-d-c-a-b;
+
+	return 0;
+}

@@ -20,25 +20,25 @@
 //     return 0;
 // }
 
-
 #include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <regex>
 
 #include "const.hpp"
 
 using namespace std;
 using namespace std::chrono;
 
-bool validar_lexico(string linha) {
-    for (auto l : linha) {
-        if ((int)l < 0 || (int)l > 127) { // ((int)l < 32 || (int)l > 126)
-            return false;
-        }
-    }
-    return true;
-}
+// bool validar_lexico(string linha) {
+//     for (auto &l : linha) {
+//         if ((int)l < 0 || (int)l > 127) { // ((int)l < 32 || (int)l > 126)
+//             return false;
+//         }
+//     }
+//     return true;
+// }
 
 bool readFile(string path, vector<string> &vec) {
     ifstream myfile(path);
@@ -46,7 +46,7 @@ bool readFile(string path, vector<string> &vec) {
 
     if (myfile.is_open()) {
         while (getline(myfile, line)) {
-            if (!validar_lexico(line)) return false;
+            // if (!validar_lexico(line)) return false;
             vec.push_back(line);
         }
         myfile.close();
@@ -54,24 +54,42 @@ bool readFile(string path, vector<string> &vec) {
     return true;
 }
 
-void get_tokens(vector<string> vec) {
-    for (auto rw : RESERVERD_WORDS) {
-        cout << rw << endl;
+// void get_tokens(vector<string> vec) {
+//     for (auto &rw : RESERVERD_WORDS) {
+//         cout << rw << endl;
+//     }
+//     cout << endl;
+//     cout << binary_search(RESERVERD_WORDS.begin(), RESERVERD_WORDS.end(), "float") << endl;
+// }
+
+string printMatches(std::string str, std::regex reg) {
+    std::sregex_iterator currentMatch(str.begin(), str.end(), reg);
+    std::sregex_iterator lastMatch;
+    string res = "";
+
+    while (currentMatch != lastMatch) {
+        std::smatch match = *currentMatch;
+        cout << match.str() << endl;
+        // res.assign(match.str());
+        currentMatch++;
     }
-    cout << endl;
-    cout << binary_search(RESERVERD_WORDS.begin(), RESERVERD_WORDS.end(), "float") << endl;
+    return res;
 }
 
 int main() {
+    // \w [a-zA-Z0-9] pega numeros e letras
+    std::regex reg("[\\w#<>/*=+-.,;:{}()\\[\\]!?/%&|]+");
+
     vector<string> v_linhas;
     steady_clock::time_point t1 = steady_clock::now();
 
     if (readFile("file.txt", v_linhas)) {
 
-        for (auto v : v_linhas) {
-            cout << v << endl;
+        for (auto &v : v_linhas) {
+            printMatches(v, reg);
+            // cout << v << endl;
         }
-        get_tokens(v_linhas);
+        // get_tokens(v_linhas);
     } else {
         cout << "Os caracteres informados sao invalidos" << endl;
     }
