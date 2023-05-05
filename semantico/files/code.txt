@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include<stdlib.h>
+
+int soma(int a, int b) {
+    return (a+b);
+}
+
+isso nao deve ser valido
+// comentario
+# tudo isso sera ignorado
+
+int subtrair(int a, int b) {
+    return (a-b);
+}
+
+int multiplicar (int a, int b) {
+    return (a*b);
+}
+
+float dividir (int a, int b) {
+    return (a/b);
+}
+
+void funcaoVazia() {
+    printf("teste");
+}
+
+int main(void) {
+    int a = 0;
+    int b = 0;
+
+    scanf("%d", &a);
+    scanf("%d", &a);
+
+    int c = soma(a,b);
+    int d = subtrair(a,b);
+    int e = multiplicar(a,b);
+    float f = dividir(a,b);
+
+    printf("%d\n", c);
+    printf("%d\n", d);
+    printf("%d\n", e);
+    printf("%d\n", f);
+
+    return 0;
+}
