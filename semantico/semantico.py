@@ -1,82 +1,155 @@
 import sintatico as s
 import re
 
-arq = open('files/code.txt','r')
+arq = open("files/code.txt", "r")
 lista = []
 for x in arq:
     x = x.strip()
-    if(len(x) > 0 and s.is_valid(x)): lista.append(x)
+    if len(x) > 0 and s.is_valid(x):
+        lista.append(x)
 
 lista_include = []
 
-# for x in lista:
-#     print(x)
 
 def getInclude(linha):
-    if '#include' in linha:
+    if "#include" in linha:
         linha = linha.split()
-        
-        if(len(linha) > 1): lista_include.append(linha[1])
-        else: lista_include.append(linha[0].replace('#include',''))
+
+        if len(linha) > 1:
+            lista_include.append(linha[1])
+        else:
+            lista_include.append(linha[0].replace("#include", ""))
         return True
     return False
 
+
 lista_funcoes = []
 lista_escopo = []
-reg_f1 = f'{s.reg_tipos.pattern}\w+\s*'
+reg_f1 = f"{s.reg_tipos.pattern}\w+\s*"
 
 escopo_atual = False
-sub_string = ''
-parametros = ''
+sub_string = ""
+parametros = ""
+
 
 def getFuncoes(linha):
-    match = re.search(reg_f1,linha)
-    
+    match = re.search(reg_f1, linha)
+
     global sub_string
     global escopo_atual
     global parametros
     global lista_escopo
-    
-    if(match and '=' not in linha):
+
+    if match and "=" not in linha:
         sub_string = match.group()
-        linha = linha.replace(sub_string,'')
-        
-        if('{' in linha):
+        linha = linha.replace(sub_string, "")
+
+        if "{" in linha:
             escopo_atual = True
-            linha = linha.replace('{','')
-        
-        if('(' in linha): linha = linha.replace('(','')
-        if(')' in linha): linha = linha.replace(')','')
-        
+            linha = linha.replace("{", "")
+
+        if "(" in linha:
+            linha = linha.replace("(", "")
+        if ")" in linha:
+            linha = linha.replace(")", "")
+
         sub_string = sub_string.strip()
         parametros = linha.strip()
-        
+
         return True
-    elif('{' in linha):
+    elif "{" in linha:
         escopo_atual = True
         return True
-    elif('}' in linha):
+    elif "}" in linha:
         lista_funcoes.append([[sub_string, parametros], lista_escopo])
         escopo_atual = False
         lista_escopo = []
         return True
-    elif(escopo_atual):
+    elif escopo_atual:
         lista_escopo.append(linha)
         return True
     return False
 
+
 for x in lista:
-    if(getInclude(x)): continue
-    elif(getFuncoes(x)): continue
-    else: print('Erro na linha: '+x)
+    if getInclude(x):
+        continue
+    elif getFuncoes(x):
+        continue
+    else:
+        print("Erro na linha: " + x)
+
+lista_funcoes_int = []
+lista_funcoes_float = []
+lista_funcoes_double = []
+lista_funcoes_char = []
+lista_funcoes_void = []
+
+
+def printFuncao(lista, name):
+    print(f"FUNCOES {name}:")
+    for x in lista:
+        print(x[0] + " | " + x[1])
+        for y in x[2]:
+            print(y)
+        print()
+
+
+def printFuncoes():
+    if len(lista_funcoes_int) > 0:
+        printFuncao(lista_funcoes_int, "INT")
+
+    if len(lista_funcoes_float) > 0:
+        print("====float====")
+        print(lista_funcoes_float)
+        print(lista_funcoes_float[0])
+        print(lista_funcoes_float[1])
+        print(lista_funcoes_float[0][0])
+        print(lista_funcoes_float[0][1])
+        print(lista_funcoes_float[0][2])
+
+    if len(lista_funcoes_double) > 0:
+        printFuncao(lista_funcoes_double, "DOUBLE")
+
+    if len(lista_funcoes_char) > 0:
+        printFuncao(lista_funcoes_char, "CHAR")
+
+    if len(lista_funcoes_void) > 0:
+        printFuncao(lista_funcoes_void, "VOID")
+
+
+# parametros
+def getParametros(parametros):
+    parametros = parametros.split(",")
+    lista_parametros = []
+    for x in parametros:
+        x = x.strip()
+        if len(x) > 0:
+            lista_parametros.append(x)
+    return lista_parametros
+
+
+print(getParametros("int a, int b, int c"))
 
 for x in lista_funcoes:
-    print(x[0])
-    for y in x[1]:
-        print(y)
-    print()
-    
-   
+    if "int " in x[0][0]:
+        aux = x[0][0].replace("int ", "")
+        lista_funcoes_int.append([aux, x[0][1], x[1]])
+    elif "float " in x[0][0]:
+        aux = x[0][0].replace("float ", "")
+        lista_funcoes_float.append([aux, getParametros(x[0][1]), x[1]])
+    elif "double " in x[0][0]:
+        aux = x[0][0].replace("double ", "")
+        lista_funcoes_double.append([aux, x[0][1], x[1]])
+    elif "char " in x[0][0]:
+        aux = x[0][0].replace("char ", "")
+        lista_funcoes_char.append([aux, x[0][1], x[1]])
+    elif "void " in x[0][0]:
+        aux = x[0][0].replace("void ", "")
+        lista_funcoes_void.append([aux, x[0][1], x[1]])
+
+printFuncoes()
+
 # lista_int = []
 # valor_int = []
 # lista_float =[]
@@ -89,7 +162,7 @@ for x in lista_funcoes:
 #         x = x.split('=')
 #         aux = x[1].replace(';','')
 #         aux = aux.strip()
-            
+
 #         x[1].strip()
 #         y = x[0]
 #         y = y.split()
@@ -109,7 +182,7 @@ for x in lista_funcoes:
 # reg3=re.compile('\d')
 
 # print("LISTA DE INTS")
-# for x in lista_int: 
+# for x in lista_int:
 #     if(re.fullmatch(reg,x[1])):
 #        print('A variavel '+x[0]+' esta validada: '+x[1])
 #     else:
@@ -133,6 +206,6 @@ for x in lista_funcoes:
 #                     else:
 #                         print('A variavel '+y+' nao esta validada')
 
-# print('\nLISTA INVALIDA')        
+# print('\nLISTA INVALIDA')
 # for x in lista_invalida:
 #     print(x)
