@@ -3,22 +3,41 @@ import re
 
 arq = open("files/code.txt", "r")
 lista = []
+key = 1
+
 for x in arq:
+    mapa = {}
     x = x.strip()
-    if len(x) > 0 and s.is_valid(x):
-        lista.append(x)
+    if len(x) > 0:
+        if not re.fullmatch(s.reg_comment, x):
+            if s.is_valid(x):
+                mapa[key] = x
+                lista.append(mapa)
+            else:
+                print(f"Erro: linha {key} não é valida")
+                exit()
+        else:
+            pass
+            # print(f"comentario --> {x}")
+    key += 1
+
 
 lista_include = []
 
+# key = 1
+# for x in lista:
+#     print(x)
+# exit()
 
-def getInclude(linha):
-    if "#include" in linha:
-        linha = linha.split()
 
-        if len(linha) > 1:
-            lista_include.append(linha[1])
+def getInclude(linha, expressao):
+    if "#include" in expressao:
+        expressao = expressao.split()
+
+        if len(expressao) > 1:
+            lista_include.append(expressao[1])
         else:
-            lista_include.append(linha[0].replace("#include", ""))
+            lista_include.append(expressao[0].replace("#include", ""))
         return True
     return False
 
@@ -27,71 +46,94 @@ lista_funcoes = []
 lista_escopo = []
 reg_f1 = f"{s.reg_tipos.pattern}\w+\s*"
 
+
 escopo_atual = False
 sub_string = ""
 parametros = ""
 
 
-def getFuncoes(linha):
-    match = re.search(reg_f1, linha)
+def getFuncoes(linha, expressao):
+    match = re.search(reg_f1, expressao)
 
     global sub_string
     global escopo_atual
     global parametros
     global lista_escopo
 
-    if match and "=" not in linha:
+    if match and "=" not in expressao:
         sub_string = match.group()
-        linha = linha.replace(sub_string, "")
+        expressao = expressao.replace(sub_string, "")
 
-        if "{" in linha:
+        if "{" in expressao:
             escopo_atual = True
-            linha = linha.replace("{", "")
+            expressao = expressao.replace("{", "")
 
-        if "(" in linha:
-            linha = linha.replace("(", "")
-        if ")" in linha:
-            linha = linha.replace(")", "")
+        if "(" in expressao:
+            expressao = expressao.replace("(", "")
+        if ")" in expressao:
+            expressao = expressao.replace(")", "")
 
         sub_string = sub_string.strip()
-        parametros = linha.strip()
+        sub_string = {linha: sub_string}
+
+        parametros = expressao.strip()
+        parametros = {linha: parametros}
 
         return True
-    elif "{" in linha:
+    elif "{" in expressao:
         escopo_atual = True
         return True
-    elif "}" in linha:
-        lista_funcoes.append([[sub_string, parametros], lista_escopo])
-        escopo_atual = False
-        lista_escopo = []
-        return True
+    elif "}" in expressao:
+        if escopo_atual:
+            lista_funcoes.append([[sub_string, parametros], lista_escopo])
+            escopo_atual = False
+            lista_escopo = []
+            return True
+        else:
+            print(f"Erro: linha {linha} }} sem escopo")
+            exit()
     elif escopo_atual:
-        lista_escopo.append(linha)
+        lista_escopo.append({linha: expressao})
         return True
     return False
 
 
 for x in lista:
-    if getInclude(x):
-        continue
-    elif getFuncoes(x):
-        continue
-    else:
-        print("Erro na linha: " + x)
+    for key, value in x.items():
+        if getInclude(key, value):
+            continue
+        elif getFuncoes(key, value):
+            continue
+        else:
+            print("Sem funcao para tratar: " + value)
 
+
+# for x in lista_include:
+#     print(f"include --> {x}")
+
+# for x in lista_funcoes:
+#     for y in x:
+#         print(y)
+# exit()
 lista_funcoes_int = []
 lista_funcoes_float = []
 lista_funcoes_double = []
 lista_funcoes_char = []
 lista_funcoes_void = []
 
+# f -> funcao
+# p -> parametro
+# c -> corpo
+
 
 def printFuncao(lista, name):
     print(f"FUNCOES {name}:")
     for x in lista:
-        print(x[0] + " | " + x[1])
-        for y in x[2]:
-            print(y)
+        print(f"f --> {x[0]}")
+        for y in x[1]:
+            print(f"p --> {y}")
+        for z in x[2]:
+            print(f"c --> {z}")
         print()
 
 
@@ -100,13 +142,7 @@ def printFuncoes():
         printFuncao(lista_funcoes_int, "INT")
 
     if len(lista_funcoes_float) > 0:
-        print("====float====")
-        print(lista_funcoes_float)
-        print(lista_funcoes_float[0])
-        print(lista_funcoes_float[1])
-        print(lista_funcoes_float[0][0])
-        print(lista_funcoes_float[0][1])
-        print(lista_funcoes_float[0][2])
+        printFuncao(lista_funcoes_float, "FLOAT")
 
     if len(lista_funcoes_double) > 0:
         printFuncao(lista_funcoes_double, "DOUBLE")
@@ -118,94 +154,140 @@ def printFuncoes():
         printFuncao(lista_funcoes_void, "VOID")
 
 
-# parametros
+def getParametro(parametro):
+    parametro = parametro.split()
+
+    if len(parametro) == 2:
+        parametro[0] = parametro[0].strip()
+        parametro[1] = parametro[1].strip()
+
+        return {parametro[0]: parametro[1]}
+    return None
+
+
 def getParametros(parametros):
     parametros = parametros.split(",")
     lista_parametros = []
     for x in parametros:
-        x = x.strip()
-        if len(x) > 0:
-            lista_parametros.append(x)
+        parametro = getParametro(x)
+        if parametro:
+            lista_parametros.append(parametro)
     return lista_parametros
 
 
-print(getParametros("int a, int b, int c"))
+def isFloat(string):
+    try:
+        float(string)
+        return True
+    except:
+        return False
+
+
+def getReturn(corpo):
+    aux = corpo.split()
+    if len(aux) == 2:
+        aux[1] = aux[1].replace(";", "").replace(")", "").replace("(", "")
+
+        if aux[1].isnumeric():
+            return {aux[0]: int(aux[1])}
+        elif aux[1].isalpha():
+            return {aux[0]: aux[1]}
+        elif isFloat(aux[1]):
+            return {aux[0]: float(aux[1])}
+
+
+def getCorpo(corpo, parametros):
+    lista_corpo = []
+    for x in corpo:
+        if re.search(s.reg_t1, x):
+            match = re.search(s.reg_t1, x)
+            aux = match.group().split("=")
+            key = aux[0].strip()
+            value = aux[1].strip().replace(";", "")
+
+            res = [getParametro(key), value]
+            lista_corpo.append(res)
+        elif re.search(s.reg_return, x):
+            match = re.search(s.reg_return, x)
+            res = getReturn(match.group())
+            if res:
+                value = res["return"]
+                if isinstance(value, str):
+                    existe = any(
+                        value in parametro.values() for parametro in parametros
+                    )
+                    if not existe:
+                        print(f"Erro: variavel {value} não declarada")
+                        exit()
+
+            lista_corpo.append(res)
+        elif re.search(s.reg_scanf, x):
+            match = re.search(s.reg_scanf, x)
+            lista_corpo.append(match.group())
+        elif re.search(s.reg_printf, x):
+            match = re.search(s.reg_printf, x)
+            lista_corpo.append(match.group())
+        else:
+            print(f"manteve ----> {x}")
+    return lista_corpo
+
 
 for x in lista_funcoes:
-    if "int " in x[0][0]:
-        aux = x[0][0].replace("int ", "")
-        lista_funcoes_int.append([aux, x[0][1], x[1]])
-    elif "float " in x[0][0]:
-        aux = x[0][0].replace("float ", "")
-        lista_funcoes_float.append([aux, getParametros(x[0][1]), x[1]])
-    elif "double " in x[0][0]:
-        aux = x[0][0].replace("double ", "")
-        lista_funcoes_double.append([aux, x[0][1], x[1]])
-    elif "char " in x[0][0]:
-        aux = x[0][0].replace("char ", "")
-        lista_funcoes_char.append([aux, x[0][1], x[1]])
-    elif "void " in x[0][0]:
-        aux = x[0][0].replace("void ", "")
-        lista_funcoes_void.append([aux, x[0][1], x[1]])
+    expressao = x[0]
+    corpo = x[1]
 
+    # comeca aki
+    
+    declaracao = expressao[0]
+    parametros = expressao[1]
+    
+    print(expressao)
+    print(declaracao)
+    print(parametros)
+    # print(corpo)
+
+    # for parametros in expressao:
+        # declaracao = parametros[0]
+        # parametro = parametros[1]
+        # print(declaracao)
+        # print(parametros)
+        # print(value)
+        # for key, value in parametro.items():
+        #     if "float " in value:
+        #         print("float")
+        #         print(f"{key} --> {value}")
+                # aux = value.replace("float ", "")
+                # print(value)
+                # aux = x[0][0].replace("float ", "")
+                # parametros = getParametros(x[0][1])
+                # corpo = getCorpo(x[1], parametros)
+                # lista_funcoes_float.append([aux, parametros, corpo])
+            # else:
+            #     print(f"{key} --> {value}")
+
+    # for value in corpo:
+    #     for key, value in value.items():
+    #         print(f"{key} --> {value}")
+
+    # finaliza aki
+
+# if "int " in x[0][0]:
+#     aux = x[0][0].replace("int ", "")
+#     lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
+# if "float " in x[0][0]:
+#     aux = x[0][0].replace("float ", "")
+#     parametros = getParametros(x[0][1])
+#     corpo = getCorpo(x[1], parametros)
+#     lista_funcoes_float.append([aux, parametros, corpo])
+# elif "double " in x[0][0]:
+#     aux = x[0][0].replace("double ", "")
+#     lista_funcoes_double.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
+# elif "char " in x[0][0]:
+#     aux = x[0][0].replace("char ", "")
+#     lista_funcoes_char.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
+# elif "void " in x[0][0]:
+#     aux = x[0][0].replace("void ", "")
+#     lista_funcoes_void.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
+
+# print()
 printFuncoes()
-
-# lista_int = []
-# valor_int = []
-# lista_float =[]
-# valor_int = []
-# nova_lista_int = []
-# lista_invalida = []
-
-# for x in lista:
-#     if('=' in x):
-#         x = x.split('=')
-#         aux = x[1].replace(';','')
-#         aux = aux.strip()
-
-#         x[1].strip()
-#         y = x[0]
-#         y = y.split()
-#         if (y[0] == 'int'):
-#             if(y[1] not in nova_lista_int):
-#                 lista_int.append([y[1],aux])
-#                 nova_lista_int.append(y[1])
-#             else:
-#                 print('A variavel '+y[1]+' ja tinha sido criada')
-#         else:
-#             lista_float.append([y[1],aux])
-#     else:
-#         lista_invalida.append(x)
-# reg=re.compile('[\w]+')
-# reg1=re.compile('\d.\d')
-# reg2=re.compile(r'[+|\-|*|/]')
-# reg3=re.compile('\d')
-
-# print("LISTA DE INTS")
-# for x in lista_int:
-#     if(re.fullmatch(reg,x[1])):
-#        print('A variavel '+x[0]+' esta validada: '+x[1])
-#     else:
-#         if(re.search(reg2,x[1])):
-#             #print(x[1])
-#             lista_aux =[]
-#             frase = ''
-#             for y in x[1]:
-#                 if(re.search(reg2,y)):
-#                     lista_aux.append(frase)
-#                     frase=''
-#                 else:
-#                     frase = frase + y
-#             lista_aux.append(frase)
-#             for y in lista_aux:
-#                 if(y in nova_lista_int):
-#                     print('A variavel '+y+' esta validada')
-#                 else:
-#                     if(re.fullmatch(reg3,y)):
-#                         print('Regra do D: A variavel '+y+' esta validada')
-#                     else:
-#                         print('A variavel '+y+' nao esta validada')
-
-# print('\nLISTA INVALIDA')
-# for x in lista_invalida:
-#     print(x)

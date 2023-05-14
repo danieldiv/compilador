@@ -1,16 +1,19 @@
 #include <stdio.h>
+#include "teste.h"
 #include<stdlib.h>
 
 int soma(int a, int b) {
     return (a+b);
 }
 
-isso nao deve ser valido
+// isso nao deve ser valido
 // comentario
-# tudo isso sera ignorado
+// # tudo isso sera ignorado
+/* asdfa sdf */
 
-int subtrair(int a, int b) {
-    return (a-b);
+// tratar quando abrir (not ok) e fechar (ok) escopo
+int subtrair(int x, int y) {
+    return (x-y);
 }
 
 int multiplicar (int a, int b) {
@@ -19,18 +22,26 @@ int multiplicar (int a, int b) {
 
 float dividir (int a, int b) {
     return (a/b);
+    return (4/5.0);
+    return a;
+    return b;
+    // danie lalves anches asdlkfj return g;
+    // return h;
+    //return h;
+    /* o sintatico nao processa, mas eh ignorado igual ao comentario, entao tratar depois */
+    return i;
+    return a;
+    return 45;
+    return 8.6;
 }
 
-float dividir2 (int a, int b) {
-    return (a/b);
-}
-
-void funcaoVazia() {
-    printf("teste");
-}
+//void funcaoVazia() {
+  //  printf("teste");
+//}
 
 int main(void) {
     int a = 0;
+    float a = 0;
     int b = 0;
 
     scanf("%d", &a);
