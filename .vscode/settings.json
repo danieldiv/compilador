@@ -55,5 +55,9 @@
         "regex": "cpp",
         "sstream": "cpp",
         "iomanip": "cpp"
-    }
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none"
 }

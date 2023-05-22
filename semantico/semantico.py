@@ -1,33 +1,7 @@
 import sintatico as s
 import re
 
-arq = open("files/code.txt", "r")
-lista = []
-key = 1
-
-for x in arq:
-    mapa = {}
-    x = x.strip()
-    if len(x) > 0:
-        if not re.fullmatch(s.reg_comment, x):
-            if s.is_valid(x):
-                mapa[key] = x
-                lista.append(mapa)
-            else:
-                print(f"Erro: linha {key} não é valida")
-                exit()
-        else:
-            pass
-            # print(f"comentario --> {x}")
-    key += 1
-
-
 lista_include = []
-
-# key = 1
-# for x in lista:
-#     print(x)
-# exit()
 
 
 def getInclude(linha, expressao):
@@ -98,60 +72,22 @@ def getFuncoes(linha, expressao):
     return False
 
 
-for x in lista:
-    for key, value in x.items():
-        if getInclude(key, value):
-            continue
-        elif getFuncoes(key, value):
-            continue
-        else:
-            print("Sem funcao para tratar: " + value)
+def separarEntradas(lista):
+    for x in lista:
+        for key, value in x.items():
+            if getInclude(key, value):
+                continue
+            elif getFuncoes(key, value):
+                continue
+            else:
+                print("Sem funcao para tratar: " + value)
 
 
-# for x in lista_include:
-#     print(f"include --> {x}")
-
-# for x in lista_funcoes:
-#     for y in x:
-#         print(y)
-# exit()
 lista_funcoes_int = []
 lista_funcoes_float = []
 lista_funcoes_double = []
 lista_funcoes_char = []
 lista_funcoes_void = []
-
-# f -> funcao
-# p -> parametro
-# c -> corpo
-
-
-def printFuncao(lista, name):
-    print(f"FUNCOES {name}:")
-    for x in lista:
-        print(f"f --> {x[0]}")
-        for y in x[1]:
-            print(f"p --> {y}")
-        for z in x[2]:
-            print(f"c --> {z}")
-        print()
-
-
-def printFuncoes():
-    if len(lista_funcoes_int) > 0:
-        printFuncao(lista_funcoes_int, "INT")
-
-    if len(lista_funcoes_float) > 0:
-        printFuncao(lista_funcoes_float, "FLOAT")
-
-    if len(lista_funcoes_double) > 0:
-        printFuncao(lista_funcoes_double, "DOUBLE")
-
-    if len(lista_funcoes_char) > 0:
-        printFuncao(lista_funcoes_char, "CHAR")
-
-    if len(lista_funcoes_void) > 0:
-        printFuncao(lista_funcoes_void, "VOID")
 
 
 def getParametro(parametro):
@@ -196,12 +132,10 @@ def getReturn(corpo):
             return {aux[0]: float(aux[1])}
 
 
-# def getCorpo(corpo, parametros):
 def getCorpo(corpo):
-    lista_corpo = []
-    # print(corpo)
+    # lista_corpo = []
     x = corpo
-    # for x in corpo:
+
     if re.search(s.reg_t1, x):
         match = re.search(s.reg_t1, x)
         aux = match.group().split("=")
@@ -221,7 +155,7 @@ def getCorpo(corpo):
                 print(value)
         #         existe = any(value in parametro.values() for parametro in parametros)
         #         if not existe:
-        #             print(f"Erro: variavel {value} não declarada")
+        #             print(f"Erro: variavel {value} nao declarada")
         #             exit()
 
         # lista_corpo.append(res)
@@ -236,39 +170,42 @@ def getCorpo(corpo):
     # return lista_corpo
 
 
-for x in lista_funcoes:
-    print(x)
-    expressao = x[0]
-    corpo = x[1]
+def tratarFuncoes():
+    for x in lista_funcoes:
+        print(x)
+        expressao = x[0]
+        corpo = x[1]
 
-    declaracao = expressao[0]
-    parametros = expressao[1]
+        declaracao = expressao[0]
+        parametros = expressao[1]
 
-    for key, value in declaracao.items():
-        # print(key, value)
+        for key, value in declaracao.items():
+            if "int" in value:
+                value = value.replace("int", "").strip()
+                print(key, value)
 
-        if "int" in value:
-            value = value.replace("int", "").strip()
-            print(key, value)
+                for key, value in parametros.items():
+                    # print(value)
+                    params = getParametros(value)
+                    print(params)
+                    for c in corpo:
+                        for key, value in c.items():
+                            # print(key, value)
+                            # print(value)
+                            teste = getCorpo(value)
+                            print(teste)
+                # print()
+                # print(value)
+                # print(getCorpo(value))
+        exit()
 
-            for key, value in parametros.items():
-                print(getParametros(value))
-                for c in corpo:
-                    for key, value in c.items():
-                        # print(key, value)
-                        getCorpo(value)
-                        # print(value)
-                        # print(getCorpo(value, ""))
+#             # lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
+#     # for key, value in parametros.items():
+#     #     print(key, value)
 
-            # lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
-    # for key, value in parametros.items():
-    #     print(key, value)
-
-    # for c in corpo:
-    #     for key, value in c.items():
-    #         print(key, value)
-    print()
-    exit()
+#     # for c in corpo:
+#     #     for key, value in c.items():
+#     #         print(key, value)
 
     # if "int" in declaracao:
     #     declaracao = declaracao.replace("int", "")
@@ -318,4 +255,4 @@ for x in lista_funcoes:
 # finaliza aki
 
 # print()
-printFuncoes()
+# printFuncoes()
