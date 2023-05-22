@@ -196,82 +196,85 @@ def getReturn(corpo):
             return {aux[0]: float(aux[1])}
 
 
-def getCorpo(corpo, parametros):
+# def getCorpo(corpo, parametros):
+def getCorpo(corpo):
     lista_corpo = []
-    for x in corpo:
-        if re.search(s.reg_t1, x):
-            match = re.search(s.reg_t1, x)
-            aux = match.group().split("=")
-            key = aux[0].strip()
-            value = aux[1].strip().replace(";", "")
+    # print(corpo)
+    x = corpo
+    # for x in corpo:
+    if re.search(s.reg_t1, x):
+        match = re.search(s.reg_t1, x)
+        aux = match.group().split("=")
+        key = aux[0].strip()
+        value = aux[1].strip().replace(";", "")
 
-            res = [getParametro(key), value]
-            lista_corpo.append(res)
-        elif re.search(s.reg_return, x):
-            match = re.search(s.reg_return, x)
-            res = getReturn(match.group())
-            if res:
-                value = res["return"]
-                if isinstance(value, str):
-                    existe = any(
-                        value in parametro.values() for parametro in parametros
-                    )
-                    if not existe:
-                        print(f"Erro: variavel {value} não declarada")
-                        exit()
+        res = [getParametro(key), value]
+        return res
+        # lista_corpo.append(res)
+    elif re.search(s.reg_return, x):
+        match = re.search(s.reg_return, x)
+        res = getReturn(match.group())
+        # print(res)
+        if res:
+            value = res["return"]
+            if isinstance(value, str):
+                print(value)
+        #         existe = any(value in parametro.values() for parametro in parametros)
+        #         if not existe:
+        #             print(f"Erro: variavel {value} não declarada")
+        #             exit()
 
-            lista_corpo.append(res)
-        elif re.search(s.reg_scanf, x):
-            match = re.search(s.reg_scanf, x)
-            lista_corpo.append(match.group())
-        elif re.search(s.reg_printf, x):
-            match = re.search(s.reg_printf, x)
-            lista_corpo.append(match.group())
-        else:
-            print(f"manteve ----> {x}")
-    return lista_corpo
+        # lista_corpo.append(res)
+    #     elif re.search(s.reg_scanf, x):
+    #         match = re.search(s.reg_scanf, x)
+    #         lista_corpo.append(match.group())
+    #     elif re.search(s.reg_printf, x):
+    #         match = re.search(s.reg_printf, x)
+    #         lista_corpo.append(match.group())
+    #     else:
+    #         print(f"manteve ----> {x}")
+    # return lista_corpo
 
 
 for x in lista_funcoes:
+    print(x)
     expressao = x[0]
     corpo = x[1]
 
-    # comeca aki
-    
     declaracao = expressao[0]
     parametros = expressao[1]
-    
-    print(expressao)
-    print(declaracao)
-    print(parametros)
-    # print(corpo)
 
-    # for parametros in expressao:
-        # declaracao = parametros[0]
-        # parametro = parametros[1]
-        # print(declaracao)
-        # print(parametros)
-        # print(value)
-        # for key, value in parametro.items():
-        #     if "float " in value:
-        #         print("float")
-        #         print(f"{key} --> {value}")
-                # aux = value.replace("float ", "")
-                # print(value)
-                # aux = x[0][0].replace("float ", "")
-                # parametros = getParametros(x[0][1])
-                # corpo = getCorpo(x[1], parametros)
-                # lista_funcoes_float.append([aux, parametros, corpo])
-            # else:
-            #     print(f"{key} --> {value}")
+    for key, value in declaracao.items():
+        # print(key, value)
 
-    # for value in corpo:
-    #     for key, value in value.items():
-    #         print(f"{key} --> {value}")
+        if "int" in value:
+            value = value.replace("int", "").strip()
+            print(key, value)
 
-    # finaliza aki
+            for key, value in parametros.items():
+                print(getParametros(value))
+                for c in corpo:
+                    for key, value in c.items():
+                        # print(key, value)
+                        getCorpo(value)
+                        # print(value)
+                        # print(getCorpo(value, ""))
 
-# if "int " in x[0][0]:
+            # lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
+    # for key, value in parametros.items():
+    #     print(key, value)
+
+    # for c in corpo:
+    #     for key, value in c.items():
+    #         print(key, value)
+    print()
+    exit()
+
+    # if "int" in declaracao:
+    #     declaracao = declaracao.replace("int", "")
+    #     print(declaracao)
+
+    # if "int " in x[0][0]:
 #     aux = x[0][0].replace("int ", "")
 #     lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
 # if "float " in x[0][0]:
@@ -288,6 +291,31 @@ for x in lista_funcoes:
 # elif "void " in x[0][0]:
 #     aux = x[0][0].replace("void ", "")
 #     lista_funcoes_void.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
+
+# for parametros in expressao:
+# declaracao = parametros[0]
+# parametro = parametros[1]
+# print(declaracao)
+# print(parametros)
+# print(value)
+# for key, value in parametro.items():
+#     if "float " in value:
+#         print("float")
+#         print(f"{key} --> {value}")
+# aux = value.replace("float ", "")
+# print(value)
+# aux = x[0][0].replace("float ", "")
+# parametros = getParametros(x[0][1])
+# corpo = getCorpo(x[1], parametros)
+# lista_funcoes_float.append([aux, parametros, corpo])
+# else:
+#     print(f"{key} --> {value}")
+
+# for value in corpo:
+#     for key, value in value.items():
+#         print(f"{key} --> {value}")
+
+# finaliza aki
 
 # print()
 printFuncoes()
