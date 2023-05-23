@@ -1,6 +1,12 @@
 import sintatico as s
 import re
 
+
+def logErro(linha, msg):
+    print(f"Erro: linha {linha} {msg}")
+    exit()
+
+
 lista_include = []
 
 
@@ -64,8 +70,7 @@ def getFuncoes(linha, expressao):
             lista_escopo = []
             return True
         else:
-            print(f"Erro: linha {linha} }} sem escopo")
-            exit()
+            logErro(linha, "}} sem escopo")
     elif escopo_atual:
         lista_escopo.append({linha: expressao})
         return True
@@ -122,6 +127,7 @@ def isFloat(string):
 def getReturn(corpo):
     aux = corpo.split()
     if len(aux) == 2:
+        # print(f"aux ---> {aux}")
         aux[1] = aux[1].replace(";", "").replace(")", "").replace("(", "")
 
         if aux[1].isnumeric():
@@ -130,10 +136,11 @@ def getReturn(corpo):
             return {aux[0]: aux[1]}
         elif isFloat(aux[1]):
             return {aux[0]: float(aux[1])}
+        else:
+            return {aux[0]: [aux[1]]}
 
 
-def getCorpo(corpo):
-    # lista_corpo = []
+def checkCorpo(linha, corpo, params, tipoRetorno):
     x = corpo
 
     if re.search(s.reg_t1, x):
@@ -143,22 +150,55 @@ def getCorpo(corpo):
         value = aux[1].strip().replace(";", "")
 
         res = [getParametro(key), value]
-        return res
-        # lista_corpo.append(res)
     elif re.search(s.reg_return, x):
         match = re.search(s.reg_return, x)
         res = getReturn(match.group())
-        # print(res)
+
         if res:
             value = res["return"]
-            if isinstance(value, str):
-                print(value)
-        #         existe = any(value in parametro.values() for parametro in parametros)
-        #         if not existe:
-        #             print(f"Erro: variavel {value} nao declarada")
-        #             exit()
 
-        # lista_corpo.append(res)
+            if isinstance(value, str):
+                existe = any(value in p.values() for p in params)
+                if not existe:
+                    logErro(linha, f"variavel {value} nao declarada")
+
+                for p in params:
+                    for tipo, variavel in p.items():
+                        if variavel == value:
+                            if tipo != tipoRetorno:
+                                logErro(linha, f"tipo de retorno invalido")
+            elif isinstance(value, int):
+                if tipoRetorno != "int":
+                    logErro(linha, f"tipo de retorno invalido")
+            elif isinstance(value, float):
+                if tipoRetorno != "float":
+                    logErro(linha, f"tipo de retorno invalido")
+            elif isinstance(value, list):
+                valores = re.split(r"[+-/*/ ]", value[0])
+
+                for val in valores:
+                    if val.isnumeric():
+                        if tipoRetorno != "int":
+                            logErro(linha, f"tipo de retorno invalido")
+                    elif val.isalpha():
+                        existe = any(val in p.values() for p in params)
+                        if not existe:
+                            logErro(linha, f"variavel {val} nao declarada")
+
+                        for p in params:
+                            for tipo, variavel in p.items():
+                                if variavel == val:
+                                    if tipo != tipoRetorno:
+                                        logErro(linha, f"tipo de retorno invalido")
+                    elif isFloat(val):
+                        if tipoRetorno != "float":
+                            logErro(linha, f"tipo de retorno invalido")
+            return True
+        else:
+            print("tipo nao identificado")
+    return False
+
+    # lista_corpo.append(res)
     #     elif re.search(s.reg_scanf, x):
     #         match = re.search(s.reg_scanf, x)
     #         lista_corpo.append(match.group())
@@ -170,9 +210,11 @@ def getCorpo(corpo):
     # return lista_corpo
 
 
+# todas as key dos dicionarios representam uma linha do codigo
 def tratarFuncoes():
     for x in lista_funcoes:
-        print(x)
+        # print(x)
+        findRetorno = False
         expressao = x[0]
         corpo = x[1]
 
@@ -180,24 +222,32 @@ def tratarFuncoes():
         parametros = expressao[1]
 
         for key, value in declaracao.items():
+            print(f"funcao ---> {key} {value}")
             if "int" in value:
                 value = value.replace("int", "").strip()
-                print(key, value)
 
                 for key, value in parametros.items():
-                    # print(value)
                     params = getParametros(value)
-                    print(params)
+                    print(f"params ---> {params}")
+
                     for c in corpo:
                         for key, value in c.items():
-                            # print(key, value)
-                            # print(value)
-                            teste = getCorpo(value)
-                            print(teste)
-                # print()
-                # print(value)
-                # print(getCorpo(value))
-        exit()
+                            print(f"---> {key} {value}")
+
+                            findRetorno = checkCorpo(key, value, params, "int")
+                            if findRetorno:
+                                break
+                        if findRetorno:
+                            break
+                    if findRetorno:
+                        break
+                if findRetorno:
+                    break
+            if findRetorno:
+                break
+        # exit()
+        print()
+
 
 #             # lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
 #     # for key, value in parametros.items():
@@ -207,11 +257,11 @@ def tratarFuncoes():
 #     #     for key, value in c.items():
 #     #         print(key, value)
 
-    # if "int" in declaracao:
-    #     declaracao = declaracao.replace("int", "")
-    #     print(declaracao)
+# if "int" in declaracao:
+#     declaracao = declaracao.replace("int", "")
+#     print(declaracao)
 
-    # if "int " in x[0][0]:
+# if "int " in x[0][0]:
 #     aux = x[0][0].replace("int ", "")
 #     lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
 # if "float " in x[0][0]:

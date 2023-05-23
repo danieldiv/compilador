@@ -3,10 +3,17 @@
 #include<stdlib.h>
 
 int soma(int a, int b){
-    return (a+b);
+    int x = 15;
+    return (a-5);
+    return (b*b);
+    return (8/6);
     return a;
-    return ab;
+    //return x;
+    //return ab;
+    return b;
     return 5;
+    //return 7.8;
+    /*daniel*/
 }
 
 // isso nao deve ser valido
