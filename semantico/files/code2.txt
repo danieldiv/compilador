@@ -2,9 +2,13 @@
 #include "teste.h"
 #include<stdlib.h>
 
-int soma(int a, int b){
-    int x = 15;
+//int x = 15;
+
+int soma(int a, int d)
+{
     int l = 6;
+    int f = 3;
+    return d;
     return (8/6);
     return (a-5);
     return (b*b);

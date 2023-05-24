@@ -12,14 +12,14 @@ reg_t1 = re.compile(
 reg_t2 = re.compile(
     f"{reg_tipos.pattern}\w+\s?\("
     f"{reg_tipos.pattern}\w+\s?,\s?"
-    f"{reg_tipos.pattern}\w+\)\s?{{"
+    f"{reg_tipos.pattern}\w+\)\s?{{?"
 )
 
 # reg_printf = re.compile(r'printf\(("%d\\n",\s(\w+)\);|"\w+"\);)')
 reg_printf = re.compile(r'printf\(("(%d|%f)\\n",\s*(\w+)\);|"\w+"\);)')
 reg_return = re.compile(r"return\s+(([\w. ]+)\s?;|\(([\w. ]+)[+|\-|*|/]([\w. ]+)\);)")
 reg_main = re.compile(r"int (main)\s?\((void)?\)\s?{")
-reg_scanf = re.compile(r'scanf\s?\("%d",\s?&\w+\)\s?;')
+reg_scanf = re.compile(r'scanf\s?\("(%d|%f|%s)",\s?&\w+\)\s?;')
 reg_chaves = re.compile(r"({|})")
 
 regexs = []
