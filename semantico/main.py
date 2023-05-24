@@ -2,7 +2,7 @@ import semantico as sem
 import sintatico as sint
 import re
 
-arq = open("files/code.txt", "r")
+arq = open("files/original.txt", "r")
 lista = []
 linha = 1
 

@@ -4,9 +4,10 @@
 
 int soma(int a, int b){
     int x = 15;
+    int l = 6;
+    return (8/6);
     return (a-5);
     return (b*b);
-    return (8/6);
     return a;
     //return x;
     //return ab;
@@ -30,19 +31,10 @@ int multiplicar (int a, int b) {
     return (a*b);
 }
 
-float dividir (int a, int b) {
+float dividir (float a, float b) {
+    int i = 0;
+    int j = 5;
     return (a/b);
-    return (4/5.0);
-    return a;
-    return b;
-    // danie lalves anches asdlkfj return g;
-    // return h;
-    //return h;
-    /* o sintatico nao processa, mas eh ignorado igual ao comentario, entao tratar depois */
-    return i;
-    return a;
-    return 45;
-    return 8.6;
 }
 
 //void funcaoVazia() {
@@ -51,8 +43,9 @@ float dividir (int a, int b) {
 
 int main(void) {
     int a = 0;
-    float a = 0;
+    //float a = 0;
     int b = 0;
+    //int c = 0;
 
     scanf("%d", &a);
     scanf("%d", &a);
@@ -62,10 +55,12 @@ int main(void) {
     int e = multiplicar(a,b);
     float f = dividir(a,b);
 
+
+    printf("%d\n", 800);
     printf("%d\n", c);
     printf("%d\n", d);
     printf("%d\n", e);
-    printf("%d\n", f);
+    printf("%f\n", f);
 
     return 0;
 }

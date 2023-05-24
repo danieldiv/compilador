@@ -1,6 +1,9 @@
 import sintatico as s
 import re
 
+INT = "int"
+FLOAT = "float"
+
 
 def logErro(linha, msg):
     print(f"Erro: linha {linha} {msg}")
@@ -23,6 +26,7 @@ def getInclude(linha, expressao):
 
 
 lista_funcoes = []
+lista_nome_funcoes = []
 lista_escopo = []
 reg_f1 = f"{s.reg_tipos.pattern}\w+\s*"
 
@@ -88,13 +92,6 @@ def separarEntradas(lista):
                 print("Sem funcao para tratar: " + value)
 
 
-lista_funcoes_int = []
-lista_funcoes_float = []
-lista_funcoes_double = []
-lista_funcoes_char = []
-lista_funcoes_void = []
-
-
 def getParametro(parametro):
     parametro = parametro.split()
 
@@ -126,8 +123,8 @@ def isFloat(string):
 
 def getReturn(corpo):
     aux = corpo.split()
+    # print(f"---------------------------> {aux}")
     if len(aux) == 2:
-        # print(f"aux ---> {aux}")
         aux[1] = aux[1].replace(";", "").replace(")", "").replace("(", "")
 
         if aux[1].isnumeric():
@@ -140,169 +137,265 @@ def getReturn(corpo):
             return {aux[0]: [aux[1]]}
 
 
+def check_retorno(x, linha, params, tipoRetorno):
+    match = re.search(s.reg_return, x)
+    res = getReturn(match.group())
+
+    if res:
+        value = res["return"]
+
+        if isinstance(value, str):
+            existe = any(value in p.values() for p in params)
+            if not existe:
+                existe = any(value in v.values() for v in lista_variaveis)
+                if not existe:
+                    logErro(linha, f"variavel {value} nao declarada")
+
+            for p in params:
+                for tipo, variavel in p.items():
+                    if variavel == value:
+                        if tipo != tipoRetorno:
+                            logErro(linha, f"tipo de retorno invalido")
+        elif isinstance(value, int):
+            if tipoRetorno != INT:
+                logErro(linha, f"tipo de retorno invalido")
+        elif isinstance(value, float):
+            if tipoRetorno != FLOAT:
+                logErro(linha, f"tipo de retorno invalido")
+        elif isinstance(value, list):
+            valores = re.split(r"[+-/*/ ]", value[0])
+
+            for val in valores:
+                if val.isnumeric():
+                    if tipoRetorno != INT:
+                        logErro(linha, f"tipo de retorno invalido")
+                elif val.isalpha():
+                    existe = any(val in p.values() for p in params)
+                    if not existe:
+                        existe = any(value in v.values() for v in lista_variaveis)
+                        if not existe:
+                            logErro(linha, f"variavel {value} nao declarada")
+
+                    for p in params:
+                        for tipo, variavel in p.items():
+                            if variavel == val:
+                                if tipo != tipoRetorno:
+                                    logErro(linha, f"tipo de retorno invalido")
+                elif isFloat(val):
+                    if tipoRetorno != FLOAT:
+                        logErro(linha, f"tipo de retorno invalido")
+        return True
+    else:
+        print(f"tipo nao identificado {x}")
+    return False
+
+
+lista_variaveis = []
+
+
+def check_nome_funcao(linha, tipo_funcao, nome_funcao):
+    for funcoes in lista_nome_funcoes:
+        for tipo, nome in funcoes.items():
+            if nome_funcao == nome:
+                if tipo == tipo_funcao:
+                    return
+    logErro(linha, f"funcao {nome_funcao} nao declarada")
+
+
+def check_variavel(linha, params, x):
+    match = re.search(s.reg_t1, x)
+    aux = match.group().split("=")
+    key = aux[0].strip()
+    value = aux[1].strip().replace(";", "")
+
+    # posicao 0 = variavel com tipo, posicao 1 = valor
+    res = [getParametro(key), value]
+
+    for key, var in res[0].items():
+        existe = any(var in p.values() for p in params)
+        if existe:
+            logErro(linha, f"variavel {var} ja foi declarada")
+        else:
+            existe = any(var in v.values() for v in lista_variaveis)
+            if existe:
+                logErro(linha, f"variavel {var} ja foi declarada")
+
+        value = value.strip()
+        print(value)
+
+        if value.isnumeric():
+            if INT != key:
+                logErro(linha, f"tipo de variavel invalido")
+        elif value.isalpha():
+            existe = any(value in p.values() for p in params)
+            if not existe:
+                existe = any(value in v.values() for v in lista_variaveis)
+                if not existe:
+                    logErro(linha, f"variavel {value} nao foi declarada")
+        elif isFloat(value):
+            pass
+        else:
+            reg = r"[\w]+"
+            match = re.search(reg, value)
+            if match:
+                nome_funcao = match.group()
+
+                check_nome_funcao(linha, key, nome_funcao)
+
+                print()
+                value = value.replace(match.group(), "")
+                print(value)
+            # print(f"{value} sem tratamento")
+
+    lista_variaveis.append(res[0])
+
+
+def check_variavel_existente(linha, params, val, tipoRetorno):
+    # verifica o tipo com relacao aos parametros
+    if len(params) != 0:
+        for p in params:
+            for tipo, variavel in p.items():
+                if variavel == val:
+                    # se o tipo nao existir nos parametros, verifica nas variaveis
+                    if tipo != tipoRetorno:
+                        for v in lista_variaveis:
+                            for tipo, variavel in v.items():
+                                if variavel == val:
+                                    # se o tipo nao existir nas variaveis, erro
+                                    if tipo != tipoRetorno:
+                                        logErro(linha, f"tipo de variavel invalido")
+    else:
+        for v in lista_variaveis:
+            for tipo, variavel in v.items():
+                if variavel == val:
+                    # se o tipo nao existir nas variaveis, erro
+                    if tipo != tipoRetorno:
+                        logErro(linha, f"tipo de variavel invalido")
+
+
 def checkCorpo(linha, corpo, params, tipoRetorno):
     x = corpo
 
     if re.search(s.reg_t1, x):
-        match = re.search(s.reg_t1, x)
-        aux = match.group().split("=")
-        key = aux[0].strip()
-        value = aux[1].strip().replace(";", "")
-
-        res = [getParametro(key), value]
+        check_variavel(linha, params, x)
     elif re.search(s.reg_return, x):
-        match = re.search(s.reg_return, x)
-        res = getReturn(match.group())
+        if check_retorno(x, linha, params, tipoRetorno):
+            return True
+    elif re.search(s.reg_scanf, x):
+        x = (
+            x.replace("scanf", "")
+            .replace(";", "")
+            .replace("(", "")
+            .replace(")", "")
+            .strip()
+        )
+        # aux = x.split(",")
+        # for val in aux:
+        #     val = val.strip()
+        #     if '"' in val:
+        #         pass
+        #     else:
+        #         if val.isnumeric():
+        #             if "%d" not in aux[0]:
+        #                 logErro(linha, f"tipo de variavel invalido")
+        #         elif val.isalpha():
+        #             if isinstance(val, str):
+        #                 existe = any(val in p.values() for p in params)
+        #                 if not existe:
+        #                     existe = any(val in v.values() for v in lista_variaveis)
+        #                     if not existe:
+        #                         logErro(linha, f"variavel {val} nao declarada")
+        #                 if "%d" in aux[0]:
+        #                     check_variavel_existente(linha, params, val, INT)
+        #                 elif "%f" in aux[0]:
+        #                     check_variavel_existente(linha, params, val, FLOAT)
+        #                 else:
+        #                     logErro(linha, f"tipo de variavel invalido")
 
-        if res:
-            value = res["return"]
-
-            if isinstance(value, str):
-                existe = any(value in p.values() for p in params)
-                if not existe:
-                    logErro(linha, f"variavel {value} nao declarada")
-
-                for p in params:
-                    for tipo, variavel in p.items():
-                        if variavel == value:
-                            if tipo != tipoRetorno:
-                                logErro(linha, f"tipo de retorno invalido")
-            elif isinstance(value, int):
-                if tipoRetorno != "int":
-                    logErro(linha, f"tipo de retorno invalido")
-            elif isinstance(value, float):
-                if tipoRetorno != "float":
-                    logErro(linha, f"tipo de retorno invalido")
-            elif isinstance(value, list):
-                valores = re.split(r"[+-/*/ ]", value[0])
-
-                for val in valores:
-                    if val.isnumeric():
-                        if tipoRetorno != "int":
-                            logErro(linha, f"tipo de retorno invalido")
-                    elif val.isalpha():
+        #         elif isFloat(val):
+        #             print("float")
+    elif re.search(s.reg_printf, x):
+        x = (
+            x.replace("printf", "")
+            .replace(";", "")
+            .replace("(", "")
+            .replace(")", "")
+            .strip()
+        )
+        aux = x.split(",")
+        for val in aux:
+            val = val.strip()
+            if '"' in val:
+                pass
+            else:
+                if val.isnumeric():
+                    if "%d" not in aux[0]:
+                        logErro(linha, f"tipo de variavel invalido")
+                elif val.isalpha():
+                    if isinstance(val, str):
                         existe = any(val in p.values() for p in params)
                         if not existe:
-                            logErro(linha, f"variavel {val} nao declarada")
+                            existe = any(val in v.values() for v in lista_variaveis)
+                            if not existe:
+                                logErro(linha, f"variavel {val} nao declarada")
+                        if "%d" in aux[0]:
+                            check_variavel_existente(linha, params, val, INT)
+                        elif "%f" in aux[0]:
+                            check_variavel_existente(linha, params, val, FLOAT)
+                        else:
+                            logErro(linha, f"tipo de variavel invalido")
 
-                        for p in params:
-                            for tipo, variavel in p.items():
-                                if variavel == val:
-                                    if tipo != tipoRetorno:
-                                        logErro(linha, f"tipo de retorno invalido")
-                    elif isFloat(val):
-                        if tipoRetorno != "float":
-                            logErro(linha, f"tipo de retorno invalido")
-            return True
-        else:
-            print("tipo nao identificado")
+                elif isFloat(val):
+                    print("float")
+    else:
+        print(f"manteve ----> {x}")
+    # print()
     return False
 
-    # lista_corpo.append(res)
-    #     elif re.search(s.reg_scanf, x):
-    #         match = re.search(s.reg_scanf, x)
-    #         lista_corpo.append(match.group())
-    #     elif re.search(s.reg_printf, x):
-    #         match = re.search(s.reg_printf, x)
-    #         lista_corpo.append(match.group())
-    #     else:
-    #         print(f"manteve ----> {x}")
-    # return lista_corpo
+
+def check_funcao(value, corpo, parametros, tipo):
+    value = value.replace(tipo, "").strip()
+
+    for key, value in parametros.items():
+        params = getParametros(value)
+        print(f"params    ---> {params}")
+
+        for c in corpo:
+            for key, value in c.items():
+                print(f"---> {key} {value}")
+
+                if checkCorpo(key, value, params, tipo):
+                    return
 
 
 # todas as key dos dicionarios representam uma linha do codigo
 def tratarFuncoes():
     for x in lista_funcoes:
-        # print(x)
-        findRetorno = False
         expressao = x[0]
         corpo = x[1]
+
+        global lista_variaveis
+        lista_variaveis = []
 
         declaracao = expressao[0]
         parametros = expressao[1]
 
         for key, value in declaracao.items():
-            print(f"funcao ---> {key} {value}")
-            if "int" in value:
-                value = value.replace("int", "").strip()
+            print(f"funcao    ---> {key} {value}")
+            aux = value.split()
+            lista_nome_funcoes.append({aux[0]: aux[1]})
 
-                for key, value in parametros.items():
-                    params = getParametros(value)
-                    print(f"params ---> {params}")
+            if INT in value:
+                check_funcao(value, corpo, parametros, INT)
+            elif FLOAT in value:
+                check_funcao(value, corpo, parametros, FLOAT)
 
-                    for c in corpo:
-                        for key, value in c.items():
-                            print(f"---> {key} {value}")
-
-                            findRetorno = checkCorpo(key, value, params, "int")
-                            if findRetorno:
-                                break
-                        if findRetorno:
-                            break
-                    if findRetorno:
-                        break
-                if findRetorno:
-                    break
-            if findRetorno:
-                break
-        # exit()
+        print("\nVARIAVEIS DECLARADAS")
+        for v in lista_variaveis:
+            for key, value in v.items():
+                print(f"--> {key} {value}")
         print()
 
-
-#             # lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
-#     # for key, value in parametros.items():
-#     #     print(key, value)
-
-#     # for c in corpo:
-#     #     for key, value in c.items():
-#     #         print(key, value)
-
-# if "int" in declaracao:
-#     declaracao = declaracao.replace("int", "")
-#     print(declaracao)
-
-# if "int " in x[0][0]:
-#     aux = x[0][0].replace("int ", "")
-#     lista_funcoes_int.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
-# if "float " in x[0][0]:
-#     aux = x[0][0].replace("float ", "")
-#     parametros = getParametros(x[0][1])
-#     corpo = getCorpo(x[1], parametros)
-#     lista_funcoes_float.append([aux, parametros, corpo])
-# elif "double " in x[0][0]:
-#     aux = x[0][0].replace("double ", "")
-#     lista_funcoes_double.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
-# elif "char " in x[0][0]:
-#     aux = x[0][0].replace("char ", "")
-#     lista_funcoes_char.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
-# elif "void " in x[0][0]:
-#     aux = x[0][0].replace("void ", "")
-#     lista_funcoes_void.append([aux, getParametros(x[0][1]), getCorpo(x[1])])
-
-# for parametros in expressao:
-# declaracao = parametros[0]
-# parametro = parametros[1]
-# print(declaracao)
-# print(parametros)
-# print(value)
-# for key, value in parametro.items():
-#     if "float " in value:
-#         print("float")
-#         print(f"{key} --> {value}")
-# aux = value.replace("float ", "")
-# print(value)
-# aux = x[0][0].replace("float ", "")
-# parametros = getParametros(x[0][1])
-# corpo = getCorpo(x[1], parametros)
-# lista_funcoes_float.append([aux, parametros, corpo])
-# else:
-#     print(f"{key} --> {value}")
-
-# for value in corpo:
-#     for key, value in value.items():
-#         print(f"{key} --> {value}")
-
-# finaliza aki
-
-# print()
-# printFuncoes()
+    print("SEMANTICO")
+    for x in lista_nome_funcoes:
+        print(x)
