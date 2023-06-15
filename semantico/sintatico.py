@@ -1,6 +1,8 @@
 import re
 
-reg_comment = re.compile(r"((//.*)|(/\*(.|\n)*\*/))")
+reg_comment = re.compile(
+    r"((//.*)|(\/\*(.*)\*\/))"
+)  # alguns caracteres precisa colocar "\" antes
 
 reg_include = re.compile(r"#include\s?(<{1}(\w*).h>{1}|\"{1}(\w*).h\"{1})")
 reg_tipos = re.compile(r"(int|float|double|char|void)\s+")
@@ -37,10 +39,20 @@ regexs.extend(
     ]
 )
 
+validade = []
 
-def is_valid(line):
+
+def is_valid(key, line):
     for reg in regexs:
         match = re.fullmatch(reg, line)
         if match:
+            validade.append({key: match.group()})
             return True
+        elif "//" in line or "/*" in line:
+            reg_aux = re.compile(f"{reg.pattern}\s?{reg_comment.pattern}")
+            match = re.fullmatch(reg_aux, line)
+            if match:
+                match_split = re.match(reg, line)
+                validade.append({key: match_split.group()})
+                return True
     return False

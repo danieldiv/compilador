@@ -137,7 +137,7 @@ def getReturn(corpo):
 
 
 def check_retorno(x, linha, params, tipoRetorno):
-    match = re.search(s.reg_return, x)
+    match = re.match(s.reg_return, x)
     res = getReturn(match.group())
 
     if res:
