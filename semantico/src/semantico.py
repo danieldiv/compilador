@@ -1,13 +1,16 @@
 import sintatico as s
+import escopo as e
+import static as st
+
 import re
 
-INT = "int"
-FLOAT = "float"
+# st.INT = "int"
+# st.FLOAT = "float"
 
 
-def logErro(linha, msg):
-    print(f"Erro: linha {linha} {msg}")
-    exit()
+# def st.logErro(linha, msg):
+#     print(f"Erro: linha {linha} {msg}")
+#     exit()
 
 
 lista_include = []
@@ -15,6 +18,7 @@ lista_include = []
 
 def getInclude(linha, expressao):
     if "#include" in expressao:
+        # print(f"include: {expressao}")
         expressao = expressao.split()
 
         if len(expressao) > 1:
@@ -27,69 +31,75 @@ def getInclude(linha, expressao):
 
 lista_funcoes = []
 lista_nome_funcoes = []
-lista_escopo = []
-reg_f1 = f"{s.reg_tipos.pattern}\w+\s*"
+# lista_escopo = []
+
+# escopo_atual = False
+# sub_string = ""
+# parametros = ""
 
 
-escopo_atual = False
-sub_string = ""
-parametros = ""
+# def getEscopo(linha, expressao):
+#     match = re.search(f"{s.reg_tipos.pattern}\w+\s*", expressao)
 
+#     global sub_string
+#     global escopo_atual
+#     global parametros
+#     global lista_escopo
 
-def getFuncoes(linha, expressao):
-    match = re.search(reg_f1, expressao)
+#     if match and "=" not in expressao:
+#         print(f"funcao: {expressao}")
+#         sub_string = match.group()
+#         expressao = expressao.replace(sub_string, "")
 
-    global sub_string
-    global escopo_atual
-    global parametros
-    global lista_escopo
+#         if "{" in expressao:
+#             escopo_atual = True
+#             expressao = expressao.replace("{", "")
 
-    if match and "=" not in expressao:
-        sub_string = match.group()
-        expressao = expressao.replace(sub_string, "")
+#         if "(" in expressao:
+#             expressao = expressao.replace("(", "")
+#         if ")" in expressao:
+#             expressao = expressao.replace(")", "")
 
-        if "{" in expressao:
-            escopo_atual = True
-            expressao = expressao.replace("{", "")
+#         sub_string = sub_string.strip()
+#         sub_string = {linha: sub_string}
 
-        if "(" in expressao:
-            expressao = expressao.replace("(", "")
-        if ")" in expressao:
-            expressao = expressao.replace(")", "")
+#         parametros = expressao.strip()
+#         parametros = {linha: parametros}
 
-        sub_string = sub_string.strip()
-        sub_string = {linha: sub_string}
-
-        parametros = expressao.strip()
-        parametros = {linha: parametros}
-
-        return True
-    elif "{" in expressao:
-        escopo_atual = True
-        return True
-    elif "}" in expressao:
-        if escopo_atual:
-            lista_funcoes.append([[sub_string, parametros], lista_escopo])
-            escopo_atual = False
-            lista_escopo = []
-            return True
-        else:
-            logErro(linha, "}} sem escopo")
-    elif escopo_atual:
-        lista_escopo.append({linha: expressao})
-        return True
-    return False
+#         return True
+#     elif "{" in expressao:
+#         escopo_atual = True
+#         return True
+#     elif "}" in expressao:
+#         if escopo_atual:
+#             lista_funcoes.append([[sub_string, parametros], lista_escopo])
+#             escopo_atual = False
+#             lista_escopo = []
+#             return True
+#         else:
+#             st.logErro(linha, "}} sem escopo")
+#     elif escopo_atual:
+#         lista_escopo.append({linha: expressao})
+#         return True
+#     return False
 
 
 def separarEntradas(lista):
+    global lista_funcoes
     for x in lista:
+        # print(f"entrada: {x}")
         for key, value in x.items():
             if getInclude(key, value):
                 continue
-            elif getFuncoes(key, value):
+            elif e.getEscopo(key, value):
                 continue
             else:
-                logErro(key, "sem funcao para tratar: " + value)
+                st.logErro(key, "sem funcao para tratar: " + value)
+    lista_funcoes = e.lista_funcoes
+    # print("fim")
+    # for x in e.lista_funcoes:
+    #     for v in x:
+    #         print(v)
 
 
 def getParametro(parametro):
@@ -148,41 +158,41 @@ def check_retorno(x, linha, params, tipoRetorno):
             if not existe:
                 existe = any(value in v.values() for v in lista_variaveis)
                 if not existe:
-                    logErro(linha, f"variavel {value} nao declarada")
+                    st.logErro(linha, f"variavel {value} nao declarada")
 
             for p in params:
                 for tipo, variavel in p.items():
                     if variavel == value:
                         if tipo != tipoRetorno:
-                            logErro(linha, f"tipo de retorno invalido")
+                            st.logErro(linha, f"tipo de retorno invalido")
         elif isinstance(value, int):
-            if tipoRetorno != INT:
-                logErro(linha, f"tipo de retorno invalido")
+            if tipoRetorno != st.INT:
+                st.logErro(linha, f"tipo de retorno invalido")
         elif isinstance(value, float):
-            if tipoRetorno != FLOAT:
-                logErro(linha, f"tipo de retorno invalido")
+            if tipoRetorno != st.FLOAT:
+                st.logErro(linha, f"tipo de retorno invalido")
         elif isinstance(value, list):
             valores = re.split(r"[+-/*/ ]", value[0])
 
             for val in valores:
                 if val.isnumeric():
-                    if tipoRetorno != INT:
-                        logErro(linha, f"tipo de retorno invalido")
+                    if tipoRetorno != st.INT:
+                        st.logErro(linha, f"tipo de retorno invalido")
                 elif val.isalpha():
                     existe = any(val in p.values() for p in params)
                     if not existe:
                         existe = any(value in v.values() for v in lista_variaveis)
                         if not existe:
-                            logErro(linha, f"variavel {value} nao declarada")
+                            st.logErro(linha, f"variavel {value} nao declarada")
 
                     for p in params:
                         for tipo, variavel in p.items():
                             if variavel == val:
                                 if tipo != tipoRetorno:
-                                    logErro(linha, f"tipo de retorno invalido")
+                                    st.logErro(linha, f"tipo de retorno invalido")
                 elif isFloat(val):
-                    if tipoRetorno != FLOAT:
-                        logErro(linha, f"tipo de retorno invalido")
+                    if tipoRetorno != st.FLOAT:
+                        st.logErro(linha, f"tipo de retorno invalido")
         return True
     else:
         print(f"tipo nao identificado {x}")
@@ -198,7 +208,7 @@ def check_nome_funcao(linha, tipo_funcao, nome_funcao):
             if nome_funcao == nome:
                 if tipo == tipo_funcao:
                     return
-    logErro(linha, f"funcao {nome_funcao} nao declarada")
+    st.logErro(linha, f"funcao {nome_funcao} nao declarada")
 
 
 def check_variavel(linha, params, x):
@@ -213,23 +223,23 @@ def check_variavel(linha, params, x):
     for key, var in res[0].items():
         existe = any(var in p.values() for p in params)
         if existe:
-            logErro(linha, f"variavel {var} ja foi declarada")
+            st.logErro(linha, f"variavel {var} ja foi declarada")
         else:
             existe = any(var in v.values() for v in lista_variaveis)
             if existe:
-                logErro(linha, f"variavel {var} ja foi declarada")
+                st.logErro(linha, f"variavel {var} ja foi declarada")
 
         value = value.strip()
 
         if value.isnumeric():
-            if INT != key:
-                logErro(linha, f"tipo de variavel invalido")
+            if st.INT != key:
+                st.logErro(linha, f"tipo de variavel invalido")
         elif value.isalpha():
             existe = any(value in p.values() for p in params)
             if not existe:
                 existe = any(value in v.values() for v in lista_variaveis)
                 if not existe:
-                    logErro(linha, f"variavel {value} nao foi declarada")
+                    st.logErro(linha, f"variavel {value} nao foi declarada")
         elif isFloat(value):
             pass
         else:
@@ -248,7 +258,7 @@ def check_variavel_in_lista(linha, val, tipoRetorno):
         for tipo, variavel in v.items():
             if variavel == val:
                 if tipo != tipoRetorno:
-                    logErro(linha, f"tipo de variavel invalido")
+                    st.logErro(linha, f"tipo de variavel invalido")
 
 
 def check_variavel_in_params(params, val, tipoRetorno):
@@ -274,13 +284,13 @@ def check_variavel_existente(linha, params, val, esq):
     if not existe:
         existe = any(val in v.values() for v in lista_variaveis)
         if not existe:
-            logErro(linha, f"variavel {val} nao declarada")
+            st.logErro(linha, f"variavel {val} nao declarada")
     if "%d" in esq:
-        check_tipo_variavel(linha, params, val, INT)
+        check_tipo_variavel(linha, params, val, st.INT)
     elif "%f" in esq:
-        check_tipo_variavel(linha, params, val, FLOAT)
+        check_tipo_variavel(linha, params, val, st.FLOAT)
     else:
-        logErro(linha, f"tipo de variavel invalido")
+        st.logErro(linha, f"tipo de variavel invalido")
 
 
 def getReadWrite(value, x):
@@ -298,7 +308,10 @@ def getReadWrite(value, x):
 def checkCorpo(linha, corpo, params, tipoRetorno):
     x = corpo
 
-    if re.search(s.reg_t1, x):
+    if re.search(s.reg_t0, x):
+        print("######## sem atribuicao ########")
+    elif re.search(s.reg_t1, x):
+        # print("com atribuicao")
         check_variavel(linha, params, x)
     elif re.search(s.reg_return, x):
         if check_retorno(x, linha, params, tipoRetorno):
@@ -312,7 +325,7 @@ def checkCorpo(linha, corpo, params, tipoRetorno):
         res = getReadWrite("printf", x)
         if res[1].isnumeric():
             if "%d" not in res[0]:
-                logErro(linha, f"tipo de variavel invalido")
+                st.logErro(linha, f"tipo de variavel invalido")
         elif res[1].isalpha():
             if isinstance(res[1], str):
                 check_variavel_existente(linha, params, res[1], res[0])
@@ -348,15 +361,22 @@ def tratarFuncoes():
         declaracao = expressao[0]
         parametros = expressao[1]
 
+        # print(f"x: {x}")
+        # print(f"expressao: {expressao}")
+        # print(f"corpo: {corpo}")
+        # print(f"declaracao: {declaracao}")
+        # print(f"parametros: {parametros}")
+        # print()
+
         for key, value in declaracao.items():
             print(f"funcao    ---> {key} {value}")
             aux = value.split()
             lista_nome_funcoes.append({aux[0]: aux[1]})
 
-            if INT in value:
-                check_funcao(value, corpo, parametros, INT)
-            elif FLOAT in value:
-                check_funcao(value, corpo, parametros, FLOAT)
+        if st.INT in value:
+            check_funcao(value, corpo, parametros, st.INT)
+        elif st.FLOAT in value:
+            check_funcao(value, corpo, parametros, st.FLOAT)
 
         print("\nVARIAVEIS DECLARADAS")
         for v in lista_variaveis:

@@ -1,6 +1,9 @@
-#include <stdio.h> //declaracao de biblioteca
+//#include <stdio.h> //declaracao de biblioteca
 
-int main() { //funcao main
+//int main() { //funcao main
+    //int a = 0; //declaracao de inteiros
+    //int argX; //declaracao de inteiros
+    //int argY = 0; //declaracao de inteiros
     //int arg1,arg2,arg3; //declaracao de inteiros
     //float arg4, arg5, arg6; //declaracao de floats
     //scanf("%i", &arg1); ///recebe o argumento 1
@@ -12,5 +15,14 @@ int main() { //funcao main
     //arg3 = arg2 - arg1 * arg6; //realiza outra operacao
     //float operacao = arg1 * arg2 / arg3 - arg4 / arg5 * arg6; //realiza a última operação
 
-    return 0; //finaliza a função main
+    //return 0; //finaliza a função main
+//}
+
+int main() { //funcao main
+    int b = 0;
+
+    int a = 0; //declaracao de inteiros
+    int argX; //declaracao de inteiros
+
+    return 0;
 }
