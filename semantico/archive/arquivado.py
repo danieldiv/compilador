@@ -1,11 +1,11 @@
 # def printFuncao(lista, name):
 #     print(f"FUNCOES {name}:")
 #     for x in lista:
-#         print(f"f --> {x[0]}")  # funcao
+#         print(f"f {st.GREEN}-->{st.RESET} {x[0]}")  # funcao
 #         for y in x[1]:
-#             print(f"p --> {y}")  # parametro
+#             print(f"p {st.GREEN}-->{st.RESET} {y}")  # parametro
 #         for z in x[2]:
-#             print(f"c --> {z}")  # corpo
+#             print(f"c {st.GREEN}-->{st.RESET} {z}")  # corpo
 #         print()
 
 

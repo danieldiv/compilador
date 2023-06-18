@@ -170,5 +170,5 @@ def checkCorpo(linha, corpo, params, tipoRetorno):
             if isinstance(res[1], str):
                 check_variavel_existente(linha, params, res[1], res[0])
     else:
-        print(f"manteve ----> {x}")
+        st.logWarning(linha, f"sem tratamento")
     return False

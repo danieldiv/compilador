@@ -1,5 +1,7 @@
 import semantic as sem
 import syntatic as sint
+import static as s
+
 import re
 
 # tratar quando for apenas a variavel sem atribuicao
@@ -19,8 +21,7 @@ for x in arq:
             if sint.is_valid(linha, x):
                 pass
             else:
-                print(f"Erro: linha {linha} nao eh valida")
-                exit()
+                s.logErro(linha, "invalida")
     linha = linha + 1
 
 lista = sint.validade

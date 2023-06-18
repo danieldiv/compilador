@@ -35,7 +35,7 @@ def separarEntradas(lista):
     print("INCLUDES")
     for x in lista_include:
         for key, value in x.items():
-            print(f"--> {key} {value}")
+            print(f"{st.GREEN}-->{st.RESET} {key} {value}")
     print()
 
 
@@ -45,11 +45,11 @@ lista_variaveis = []
 def check_funcao(corpo, parametros, tipo):
     for key, value in parametros.items():
         params = par.getParametros(value)
-        print(f"params    ---> {params}")
+        print(f"params    {st.GREEN}-->{st.RESET} {params}")
 
         for c in corpo:
             for key, value in c.items():
-                print(f"---> {key} {value}")
+                print(f"{st.GREEN}-->{st.RESET} {key} {value}")
 
                 bd.lista_variaveis = lista_variaveis
                 bd.lista_nome_funcoes = lista_nome_funcoes
@@ -71,7 +71,7 @@ def tratarFuncoes():
         parametros = expressao[1]
 
         for key, value in declaracao.items():
-            print(f"funcao    ---> {key} {value}")
+            print(f"funcao    {st.GREEN}-->{st.RESET} {key} {value}")
             aux = value.split()
 
             exist = any(aux[1] in p.values() for p in lista_nome_funcoes)
@@ -92,7 +92,7 @@ def tratarFuncoes():
             print("\nVARIAVEIS DECLARADAS")
             for v in lista_variaveis:
                 for key, value in v.items():
-                    print(f"--> {key} {value}")
+                    print(f"{st.GREEN}-->{st.RESET} {key} {value}")
             print()
 
     print("SEMANTICO")
