@@ -1,4 +1,6 @@
-import sintatico as s
+# separa o codigo em escopos
+
+import syntatic as s
 import static as st
 
 import re

@@ -1,5 +1,5 @@
-import semantico as sem
-import sintatico as sint
+import semantic as sem
+import syntatic as sint
 import re
 
 # tratar quando for apenas a variavel sem atribuicao
@@ -27,4 +27,3 @@ lista = sint.validade
 
 sem.separarEntradas(lista)
 sem.tratarFuncoes()
-# print(sint.reg_f1)
