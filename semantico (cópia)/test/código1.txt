@@ -1,0 +1,19 @@
+#include <stdio.h> //declaracao de biblioteca
+
+int main() { //funcao main
+    int a = 0; //declaracao de inteiros
+    int argX; //declaracao de inteiros
+    int argY = 0; //declaracao de inteiros
+    int arg1,arg2,arg3; //declaracao de inteiros
+    float arg4, arg5, arg6  ,  arg7  ; //declaracao de floats
+    scanf("%i", &arg1); ///recebe o argumento 1
+    scanf("%i", &arg2); //recebe o argumento 2
+    scanf("%f", &arg4); //recebe o argumento 3
+    scanf("%f", &arg5); //recebe o argumento 4
+    
+    int arg13 = arg2 - arg1 * arg6; //realiza outra operacao
+    arg6 = (float) arg1 + (float) arg2 * arg4; //realizacao uma operação
+    float operacao = arg1 * arg2 / arg3 - arg4 / arg5 * arg6; //realiza a última operação
+
+    return (0+1); //finaliza a função main
+}

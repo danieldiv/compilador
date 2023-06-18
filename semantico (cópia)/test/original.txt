@@ -1,0 +1,28 @@
+#include <stdio.h>
+int somar (int a, int b){
+    return (a+b);
+}
+int subtrair (int a, int b){
+    return (a-b);
+}
+int multiplicar (int a, int b){
+    return (a*b);
+}
+float dividir(float a, float b){
+    return (a/b);
+}
+int main(void){
+    int a = 0;
+    int b = 0;
+    scanf("%d",&a);
+    scanf("%d",&b);
+    int c = somar(a,b);
+    int d = subtrair(a,b);
+    int e = multiplicar(a,b);
+    float f = dividir(a,b);
+    printf("%d\n",c);
+    printf("%d\n",d);
+    printf("%d\n",e);
+    printf("%f\n",f);
+    return 0;
+}

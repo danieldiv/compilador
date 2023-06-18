@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include "teste.h"
+#include<stdlib.h>
+
+//int x = 15;
+
+int soma(int a, int d)
+{
+    int l = 6;
+    int f = 3;
+    return d;
+    return (8/6);
+    return (a-5);
+    return (b*b);
+    return a;
+    //return x;
+    //return ab;
+    return b;
+    return 5;
+    //return 7.8;
+    /*daniel*/
+}
+
+// isso nao deve ser valido
+// comentario
+// # tudo isso sera ignorado
+/* asdfa sdf */
+
+// tratar quando abrir (not ok) e fechar (ok) escopo
+int subtrair(int x, int y) {
+    return x;
+    return (x-y);
+}
+
+int multiplicar (int a, int b) {
+    return (a*b);
+}
+
+//float dividir2 (float a) {
+    //return 25.0;
+//}
+float dividir2 (float a) {
+    return 25.0;
+}
+float dividir (float a, float b) {
+    int i = 0;
+    int j = 5;
+    return (a/b);
+}
+
+void funcaoVazia() {
+    printf("teste");
+}
+
+int main(void)
+{
+    int aa;
+    int a = 0; //teste
+    //float a = 0;
+    int b = 0;
+    //int c = 0;
+    scanf("%d", &a);
+    scanf("%d", &a);
+
+    //int c = soma(a,b);
+    int c = soma(a,b,a,b,b,b,b);
+    int d = subtrair(a,b);
+    int e = multiplicar(a,b);
+    float f = dividir(a,b);
+
+
+    printf("%d\n", 800);
+    printf("%d\n", c);
+    printf("%d\n", d);
+    printf("%d\n", e);
+    printf("%f\n", f);
+
+    return 0;
+}
