@@ -20,11 +20,9 @@ reg_funcao = re.compile(
     rf"(,\s?{reg_tipos.pattern}\w+\s?){{,}})\)\s?{{?"
 )
 
-# reg_printf = re.compile(r'printf\(("%d\\n",\s(\w+)\);|"\w+"\);)')
 reg_printf = re.compile(r'printf\(("(%d|%f)\\n",\s*(\w+)\);|"\w+"\);)')
 reg_return = re.compile(r"return\s?(([\w. ]+)\s?;|\(([\w. ]+)[+|\-|*|/]([\w. ]+)\);)")
-# reg_main = re.compile(r"int (main)\s?\((void)?\)\s?{?")
-reg_scanf = re.compile(r'scanf\s?\("(%d|%f|%s)",\s?&\w+\)\s?;')
+reg_scanf = re.compile(r'scanf\s?\("(%d|%i|%f|%lf|%s)",\s?&\w+\)\s?;')
 reg_chaves = re.compile(r"({|})")
 
 regexs = []
@@ -37,7 +35,6 @@ regexs.extend(
         reg_funcao,
         reg_printf,
         reg_return,
-        # reg_main,
         reg_scanf,
         reg_chaves,
     ]

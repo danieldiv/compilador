@@ -36,6 +36,9 @@ int multiplicar (int a, int b) {
     return (a*b);
 }
 
+//float dividir2 (float a) {
+    //return 25.0;
+//}
 float dividir2 (float a) {
     return 25.0;
 }

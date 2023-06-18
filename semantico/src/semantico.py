@@ -1,16 +1,10 @@
 import sintatico as s
-import escopo as e
+
 import static as st
+import parametros as p
+import escopo as e
 
 import re
-
-# st.INT = "int"
-# st.FLOAT = "float"
-
-
-# def st.logErro(linha, msg):
-#     print(f"Erro: linha {linha} {msg}")
-#     exit()
 
 
 lista_include = []
@@ -18,7 +12,6 @@ lista_include = []
 
 def getInclude(linha, expressao):
     if "#include" in expressao:
-        # print(f"include: {expressao}")
         expressao = expressao.split()
 
         if len(expressao) > 1:
@@ -31,63 +24,11 @@ def getInclude(linha, expressao):
 
 lista_funcoes = []
 lista_nome_funcoes = []
-# lista_escopo = []
-
-# escopo_atual = False
-# sub_string = ""
-# parametros = ""
-
-
-# def getEscopo(linha, expressao):
-#     match = re.search(f"{s.reg_tipos.pattern}\w+\s*", expressao)
-
-#     global sub_string
-#     global escopo_atual
-#     global parametros
-#     global lista_escopo
-
-#     if match and "=" not in expressao:
-#         print(f"funcao: {expressao}")
-#         sub_string = match.group()
-#         expressao = expressao.replace(sub_string, "")
-
-#         if "{" in expressao:
-#             escopo_atual = True
-#             expressao = expressao.replace("{", "")
-
-#         if "(" in expressao:
-#             expressao = expressao.replace("(", "")
-#         if ")" in expressao:
-#             expressao = expressao.replace(")", "")
-
-#         sub_string = sub_string.strip()
-#         sub_string = {linha: sub_string}
-
-#         parametros = expressao.strip()
-#         parametros = {linha: parametros}
-
-#         return True
-#     elif "{" in expressao:
-#         escopo_atual = True
-#         return True
-#     elif "}" in expressao:
-#         if escopo_atual:
-#             lista_funcoes.append([[sub_string, parametros], lista_escopo])
-#             escopo_atual = False
-#             lista_escopo = []
-#             return True
-#         else:
-#             st.logErro(linha, "}} sem escopo")
-#     elif escopo_atual:
-#         lista_escopo.append({linha: expressao})
-#         return True
-#     return False
 
 
 def separarEntradas(lista):
     global lista_funcoes
     for x in lista:
-        # print(f"entrada: {x}")
         for key, value in x.items():
             if getInclude(key, value):
                 continue
@@ -96,31 +37,27 @@ def separarEntradas(lista):
             else:
                 st.logErro(key, "sem funcao para tratar: " + value)
     lista_funcoes = e.lista_funcoes
-    # print("fim")
-    # for x in e.lista_funcoes:
-    #     for v in x:
-    #         print(v)
 
 
-def getParametro(parametro):
-    parametro = parametro.split()
+# def getParametro(parametro):
+#     parametro = parametro.split()
 
-    if len(parametro) == 2:
-        parametro[0] = parametro[0].strip()
-        parametro[1] = parametro[1].strip()
+#     if len(parametro) == 2:
+#         parametro[0] = parametro[0].strip()
+#         parametro[1] = parametro[1].strip()
 
-        return {parametro[0]: parametro[1]}
-    return None
+#         return {parametro[0]: parametro[1]}
+#     return None
 
 
-def getParametros(parametros):
-    parametros = parametros.split(",")
-    lista_parametros = []
-    for x in parametros:
-        parametro = getParametro(x)
-        if parametro:
-            lista_parametros.append(parametro)
-    return lista_parametros
+# def getParametros(parametros):
+#     parametros = parametros.split(",")
+#     lista_parametros = []
+#     for x in parametros:
+#         parametro = getParametro(x)
+#         if parametro:
+#             lista_parametros.append(parametro)
+#     return lista_parametros
 
 
 def isFloat(string):
@@ -211,14 +148,35 @@ def check_nome_funcao(linha, tipo_funcao, nome_funcao):
     st.logErro(linha, f"funcao {nome_funcao} nao declarada")
 
 
+def check_variavel_sem_atribuicao(linha, params, x):
+    x = x.replace(";", "").strip()
+    x = x.replace(", ", ",").strip()
+    x = x.split()
+
+    tipo = x[0].strip()
+    variaveis = x[1].split(",")
+
+    for variavel in variaveis:
+        existe = any(variavel in p.values() for p in params)
+        if existe:
+            st.logErro(linha, f"variavel {variavel} ja foi declarada")
+        else:
+            existe = any(variavel in v.values() for v in lista_variaveis)
+            if existe:
+                st.logErro(linha, f"variavel {variavel} ja foi declarada")
+
+        lista_variaveis.append({tipo: variavel})
+
+
 def check_variavel(linha, params, x):
     match = re.search(s.reg_t1, x)
     aux = match.group().split("=")
+
     key = aux[0].strip()
     value = aux[1].strip().replace(";", "")
 
     # posicao 0 = variavel com tipo, posicao 1 = valor
-    res = [getParametro(key), value]
+    res = [p.getParametro(key), value]
 
     for key, var in res[0].items():
         existe = any(var in p.values() for p in params)
@@ -287,8 +245,14 @@ def check_variavel_existente(linha, params, val, esq):
             st.logErro(linha, f"variavel {val} nao declarada")
     if "%d" in esq:
         check_tipo_variavel(linha, params, val, st.INT)
+    elif "%i" in esq:
+        check_tipo_variavel(linha, params, val, st.INT)
+    elif "%c" in esq:
+        check_tipo_variavel(linha, params, val, st.CHAR)
     elif "%f" in esq:
         check_tipo_variavel(linha, params, val, st.FLOAT)
+    elif "%lf" in esq:
+        check_tipo_variavel(linha, params, val, st.DOUBLE)
     else:
         st.logErro(linha, f"tipo de variavel invalido")
 
@@ -302,6 +266,8 @@ def getReadWrite(value, x):
         .strip()
     )
     aux = x.split(",")
+    if len(aux) == 1:
+        return [aux[0].strip(), ""]
     return [aux[0].strip(), aux[1].strip()]
 
 
@@ -309,9 +275,8 @@ def checkCorpo(linha, corpo, params, tipoRetorno):
     x = corpo
 
     if re.search(s.reg_t0, x):
-        print("######## sem atribuicao ########")
+        check_variavel_sem_atribuicao(linha, params, x)
     elif re.search(s.reg_t1, x):
-        # print("com atribuicao")
         check_variavel(linha, params, x)
     elif re.search(s.reg_return, x):
         if check_retorno(x, linha, params, tipoRetorno):
@@ -334,11 +299,9 @@ def checkCorpo(linha, corpo, params, tipoRetorno):
     return False
 
 
-def check_funcao(value, corpo, parametros, tipo):
-    value = value.replace(tipo, "").strip()
-
+def check_funcao(corpo, parametros, tipo):
     for key, value in parametros.items():
-        params = getParametros(value)
+        params = p.getParametros(value)
         print(f"params    ---> {params}")
 
         for c in corpo:
@@ -361,28 +324,30 @@ def tratarFuncoes():
         declaracao = expressao[0]
         parametros = expressao[1]
 
-        # print(f"x: {x}")
-        # print(f"expressao: {expressao}")
-        # print(f"corpo: {corpo}")
-        # print(f"declaracao: {declaracao}")
-        # print(f"parametros: {parametros}")
-        # print()
-
         for key, value in declaracao.items():
             print(f"funcao    ---> {key} {value}")
             aux = value.split()
+
+            exist = any(aux[1] in p.values() for p in lista_nome_funcoes)
+            if exist:
+                st.logErro(key, f"funcao {aux[1]} ja foi declarada")
+
             lista_nome_funcoes.append({aux[0]: aux[1]})
 
-        if st.INT in value:
-            check_funcao(value, corpo, parametros, st.INT)
-        elif st.FLOAT in value:
-            check_funcao(value, corpo, parametros, st.FLOAT)
+            if st.INT in value:
+                check_funcao(corpo, parametros, st.INT)
+            elif st.FLOAT in value:
+                check_funcao(corpo, parametros, st.FLOAT)
+            elif st.VOID in value:
+                check_funcao(corpo, parametros, st.VOID)
+            else:
+                print(f"tipo nao identificado: {value}")
 
-        print("\nVARIAVEIS DECLARADAS")
-        for v in lista_variaveis:
-            for key, value in v.items():
-                print(f"--> {key} {value}")
-        print()
+            print("\nVARIAVEIS DECLARADAS")
+            for v in lista_variaveis:
+                for key, value in v.items():
+                    print(f"--> {key} {value}")
+            print()
 
     print("SEMANTICO")
     for x in lista_nome_funcoes:
