@@ -9,7 +9,7 @@ import re
 
 # arq = open("../test/original.txt", "r")
 # arq = open("../test/code2.txt", "r")
-arq = open("../test/código1.txt", "r")
+arq = open("../test/código4.txt", "r")
 
 lista = []
 linha = 1

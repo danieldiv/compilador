@@ -13,10 +13,12 @@ int main() //função main
     arg3 = arg2 - arg1 * arg6; //realiza outra operacao
     float operacao = arg1 * arg2 / arg3 - arg4 / arg5 * arg6; //realiza a última operação
     if (arg6 > arg3){
-	arg5 = arg2 * arg4;
+	    arg5 = arg2 * arg4;
+	    arg6 = arg56 * teste;
     }
     else{
-	arg1 = arg5 / arg6;
+	    arg1 = arg5 / arg6;
+	    arg51 = arg5 + arg6;
     }
 
     return arg2; //finaliza a função main

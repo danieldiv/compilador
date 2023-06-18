@@ -8,6 +8,7 @@ reg_include = re.compile(r"#include\s?(<{1}(\w*).h>{1}|\"{1}(\w*).h\"{1})")
 reg_tipos = re.compile(r"(int|float|double|char|void)\s+")
 reg_cast = re.compile(r"\(\s?(int|float|double|char|void)\s?\)\s?")
 reg_operadores = re.compile(r"(\+|\-|\*|\/|\%|\+\+|\-\-)\s?")
+reg_comparacao = re.compile(r"(\<|\>|\<=|\>=|==|\!=)\s?")
 reg_args = re.compile(r"(int\sargc,\s?char\s\*argv\[\]|void)\s?")
 
 reg_t0 = re.compile(rf"{reg_tipos.pattern}\w+" rf"(\s?,\s?\w+\s?){{,}};")
@@ -34,6 +35,11 @@ reg_return = re.compile(r"return\s?(([\w. ]+)\s?;|\(([\w. ]+)[+|\-|*|/]([\w. ]+)
 reg_scanf = re.compile(r'scanf\s?\("(%d|%i|%f|%lf|%s)",\s?&\w+\)\s?;')
 reg_chaves = re.compile(r"({|})")
 
+reg_condicional = re.compile(
+    rf"(if\s?\(\s?\w+\s?{reg_comparacao.pattern}\w+\s?\)\s?{{)|"
+    rf"(else\s?{{)|(else\sif\s?\(\w+\s?{reg_comparacao.pattern}\w+\)\s?{{)"
+)
+
 regexs = []
 
 regexs.extend(
@@ -43,6 +49,7 @@ regexs.extend(
         reg_t1,
         reg_t2,
         reg_funcao,
+        reg_condicional,
         reg_printf,
         reg_return,
         reg_scanf,

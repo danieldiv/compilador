@@ -20,6 +20,26 @@ def getInclude(linha, expressao):
     return False
 
 
+def printFuncoes():
+    print("FUNCOES")
+    for corpo in lista_funcoes:
+        for c in corpo:
+            for valores in c:
+                if not isinstance(valores, list):
+                    for key, value in valores.items():
+                        st.printLine(key, value)
+                else:
+                    condicao = valores[0]
+                    corpo_condicao = valores[1]
+                    st.printCondicional("None", condicao)
+
+                    for c in corpo_condicao:
+                        for key, value in c.items():
+                            st.printCondicional(key, value)
+        print()
+    exit()
+
+
 def separarEntradas(lista):
     global lista_funcoes
     for x in lista:
@@ -31,12 +51,12 @@ def separarEntradas(lista):
             else:
                 st.logErro(key, "sem funcao para tratar: " + value)
     lista_funcoes = esc.lista_funcoes
-
-    print("INCLUDES")
+    st.printTitle("INCLUDES")
     for x in lista_include:
         for key, value in x.items():
-            print(f"{st.GREEN}-->{st.RESET} {key} {value}")
+            st.printLine(key, value)
     print()
+    # printFuncoes()
 
 
 lista_variaveis = []
@@ -45,17 +65,22 @@ lista_variaveis = []
 def check_funcao(corpo, parametros, tipo):
     for key, value in parametros.items():
         params = par.getParametros(value)
-        print(f"params    {st.GREEN}-->{st.RESET} {params}")
+        print(f"{st.CYAN}params {st.GREEN}-->{st.RESET} {params}")
 
         for c in corpo:
-            for key, value in c.items():
-                print(f"{st.GREEN}-->{st.RESET} {key} {value}")
+            if not isinstance(c, list):
+                for key, value in c.items():
+                    st.printLine(key, value)
+                    bd.lista_variaveis = lista_variaveis
+                    bd.lista_nome_funcoes = lista_nome_funcoes
 
-                bd.lista_variaveis = lista_variaveis
-                bd.lista_nome_funcoes = lista_nome_funcoes
-
-                if bd.checkCorpo(key, value, params, tipo):
-                    return
+                    if bd.checkCorpo(key, value, params, tipo):
+                        return
+            else:
+                condicao = c[0]
+                # corpo_condicao = c[1]
+                for key, value in condicao[0].items():
+                    st.logWarning(key, f"sem tratamento para condicional {value}")
 
 
 # todas as key dos dicionarios representam uma linha do codigo
@@ -70,31 +95,39 @@ def tratarFuncoes():
         declaracao = expressao[0]
         parametros = expressao[1]
 
-        for key, value in declaracao.items():
-            print(f"funcao    {st.GREEN}-->{st.RESET} {key} {value}")
-            aux = value.split()
+        if st.CONDICIONAL not in declaracao and st.ELSE not in declaracao:
+            for key, value in declaracao.items():
+                print(f"{st.CYAN}funcao {st.GREEN}-->{st.RESET} {key} {value}")
+                aux = value.split()
 
-            exist = any(aux[1] in p.values() for p in lista_nome_funcoes)
-            if exist:
-                st.logErro(key, f"funcao {aux[1]} ja foi declarada")
+                exist = any(aux[1] in p.values() for p in lista_nome_funcoes)
+                if exist:
+                    st.logErro(key, f"funcao {aux[1]} ja foi declarada")
 
-            lista_nome_funcoes.append({aux[0]: aux[1]})
+                lista_nome_funcoes.append({aux[0]: aux[1]})
 
-            if st.INT in value:
-                check_funcao(corpo, parametros, st.INT)
-            elif st.FLOAT in value:
-                check_funcao(corpo, parametros, st.FLOAT)
-            elif st.VOID in value:
-                check_funcao(corpo, parametros, st.VOID)
-            else:
-                print(f"tipo nao identificado: {value}")
+                if st.INT in value:
+                    check_funcao(corpo, parametros, st.INT)
+                elif st.FLOAT in value:
+                    check_funcao(corpo, parametros, st.FLOAT)
+                elif st.VOID in value:
+                    check_funcao(corpo, parametros, st.VOID)
+                else:
+                    print(f"tipo nao identificado: {value}")
 
-            print("\nVARIAVEIS DECLARADAS")
-            for v in lista_variaveis:
-                for key, value in v.items():
-                    print(f"{st.GREEN}-->{st.RESET} {key} {value}")
+                if len(lista_variaveis) > 0:
+                    st.printTitle("\nVARIAVEIS DECLARADAS")
+                    for v in lista_variaveis:
+                        for key, value in v.items():
+                            st.printLine(key, value)
+                print()
+        else:
+            st.printWarning("funcao com condicional")
+            print(f"{declaracao}")
+            print(f"{parametros}")
+            print(f"{corpo}")
             print()
 
-    print("SEMANTICO")
+    st.printTitle("SEMANTICO")
     for x in lista_nome_funcoes:
         print(x)

@@ -5,76 +5,173 @@ import static as st
 
 import re
 
-dados_escopo = []
-lista_funcoes = []
+dados_escopo_funcao = []
+dados_escopo_condicional = []
 
-escopo_atual = False
+lista_funcoes = []
+lista_condicional = []
+
+escopo_funcao = False
+escopo_condicional = False
+condicional = False
+else_condicional = False
+
 definicao = ""
 parametros = ""
+comparacao = ""
+# chave = ""
 
 
 def initEscopo(linha, expressao):
-    global escopo_atual
+    global escopo_funcao
 
     if "{" in expressao:
-        if not escopo_atual:
-            escopo_atual = True
+        if not escopo_funcao:
+            escopo_funcao = True
             return True
         else:
-            st.logErro(linha, "escopo ja iniciado")
+            st.logErro(linha, "escopo funcao ja iniciado")
+    return False
+
+
+def initEscopoCondicional(linha, expressao):
+    global escopo_condicional
+
+    if "{" in expressao:
+        if not escopo_condicional and escopo_funcao:
+            escopo_condicional = True
+            return True
+        else:
+            st.logErro(linha, "escopo condicional ja iniciado")
     return False
 
 
 def endEscopo(linha, expressao):
-    global escopo_atual
-    global dados_escopo
+    global escopo_funcao
+    global dados_escopo_funcao
 
     if "}" in expressao:
-        if escopo_atual:
-            lista_funcoes.append([[definicao, parametros], dados_escopo])
-            escopo_atual = False
-            dados_escopo = []
+        if escopo_funcao:
+            lista_funcoes.append([[definicao, parametros], dados_escopo_funcao])
+            escopo_funcao = False
+            dados_escopo_funcao = []
             return True
         else:
             st.logErro(linha, "} sem escopo")
     return False
 
 
-def getEscopo(linha, expressao):
-    match = re.search(f"{s.reg_funcao.pattern}", expressao)
+def endEscopoCondicional(linha, expressao):
+    global escopo_condicional
+    global dados_escopo_condicional
+    global condicional
 
-    if match:
-        global definicao
-        global parametros
+    if "}" in expressao:
+        if escopo_condicional and escopo_funcao:
+            dados_escopo_funcao.append([comparacao, dados_escopo_condicional])
+            escopo_condicional = False
+            condicional = False
+            dados_escopo_condicional = []
+            return True
+        else:
+            st.logErro(linha, "} sem escopo")
+    return False
 
-        if initEscopo(linha, expressao):
-            expressao = expressao.replace("{", "")
-        if endEscopo(linha, expressao):
-            expressao = expressao.replace("}", "")
 
-        definicao = re.search(f"{s.reg_tipos.pattern}\w+\s*", expressao).group()
-        expressao = expressao.replace(definicao, "")
+def limparFuncao(linha, expressao):
+    global definicao
+    global parametros
 
-        if "(" in expressao:
-            expressao = expressao.replace("(", "")
-        if ")" in expressao:
-            expressao = expressao.replace(")", "")
+    if initEscopo(linha, expressao):
+        expressao = expressao.replace("{", "")
+    if endEscopo(linha, expressao):
+        expressao = expressao.replace("}", "")
 
-        definicao = definicao.strip()
-        definicao = {linha: definicao}
+    definicao = re.search(f"{s.reg_tipos.pattern}\w+\s*", expressao).group()
+    expressao = expressao.replace(definicao, "")
 
-        parametros = expressao.strip()
-        parametros = {linha: parametros}
+    if "(" in expressao:
+        expressao = expressao.replace("(", "")
+    if ")" in expressao:
+        expressao = expressao.replace(")", "")
 
-    elif initEscopo(linha, expressao):
+    definicao = definicao.strip()
+    definicao = {linha: definicao}
+
+    parametros = expressao.strip()
+    parametros = {linha: parametros}
+
+
+def limparCondicional(linha, expressao):
+    global condicional
+    global comparacao
+    # global chave
+
+    condicional = True
+
+    if initEscopoCondicional(linha, expressao):
+        expressao = expressao.replace("{", "")
+    if endEscopoCondicional(linha, expressao):
+        expressao = expressao.replace("}", "")
+
+    if "(" in expressao:
+        expressao = expressao.replace("(", "")
+    if ")" in expressao:
+        expressao = expressao.replace(")", "")
+
+    if st.CONDICIONAL in expressao:
+        expressao = expressao.replace(st.CONDICIONAL, "").strip()
+        condicional = re.search(f"{s.reg_comparacao.pattern}", expressao).group()
+        expressao = expressao.replace(condicional, "")
+        valores = expressao.split()
+        comparacao = {
+            linha: [valores[0].strip(), condicional.strip(), valores[1].strip()]
+        }
+        comparacao = [{linha: st.CONDICIONAL}, comparacao]
+    elif st.ELSE in expressao:
+        comparacao = {linha: ""}
+        comparacao = [{linha: st.ELSE}, comparacao]
+    else:
+        st.logErro(linha, "escopo condicional invalido")
+
+
+def adicionarDadosFuncao(linha, expressao):
+    if initEscopo(linha, expressao):
         expressao = expressao.replace("{", "")
         if endEscopo(linha, expressao):
             expressao = expressao.replace("}", "")
     elif endEscopo(linha, expressao):
         expressao = expressao.replace("}", "")
     else:
-        if escopo_atual:
-            dados_escopo.append({linha: expressao})
+        if escopo_funcao:
+            dados_escopo_funcao.append({linha: expressao})
         else:
-            st.logErro(linha, "escopo nao iniciado")
+            st.logErro(linha, "escopo funcao nao iniciado")
+
+
+def adicionarDadosCondicional(linha, expressao):
+    if initEscopoCondicional(linha, expressao):
+        expressao = expressao.replace("{", "")
+        if endEscopoCondicional(linha, expressao):
+            expressao = expressao.replace("}", "")
+    elif endEscopoCondicional(linha, expressao):
+        expressao = expressao.replace("}", "")
+    else:
+        if escopo_condicional:
+            dados_escopo_condicional.append({linha: expressao})
+        else:
+            st.logErro(linha, "escopo condicional nao iniciado")
+
+
+def getEscopo(linha, expressao):
+    match = re.search(f"{s.reg_funcao.pattern}", expressao)
+
+    if match:
+        limparFuncao(linha, expressao)
+    elif re.search(f"{s.reg_condicional.pattern}", expressao):
+        limparCondicional(linha, expressao)
+    elif condicional and not else_condicional:
+        adicionarDadosCondicional(linha, expressao)
+    else:
+        adicionarDadosFuncao(linha, expressao)
     return True
