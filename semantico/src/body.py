@@ -119,31 +119,31 @@ def check_variavel(linha, params, x):
 
     key = aux[0].strip()
     value = aux[1].strip().replace(";", "")
-
-    # posicao 0 = variavel com tipo, posicao 1 = valor
     res = [par.getParametro(key), value]
 
-    for key, variavel in res[0].items():
-        test_variavel_existencia(variavel, params, linha)
+    if res[0] != None:
+        for key, variavel in res[0].items():
+            test_variavel_existencia(variavel, params, linha)
 
-        value = value.strip()
+            value = value.strip()
 
-        if value.isnumeric():
-            if st.INT != key:
-                st.logErro(linha, f"tipo de variavel invalido")
-        elif value.isalpha():
-            test_variavel_inesistente(value, params, linha)
-        elif st.isFloat(value):
-            pass
-        else:
-            reg = r"[\w]+"
-            match = re.search(reg, value)
-            if match:
-                nome_funcao = match.group()
-                check_nome_funcao(linha, key, nome_funcao)
-                value = value.replace(match.group(), "")
-
-    lista_variaveis.append(res[0])
+            if value.isnumeric():
+                if st.INT != key:
+                    st.logErro(linha, f"tipo de variavel invalido")
+            elif value.isalpha():
+                test_variavel_inesistente(value, params, linha)
+            elif st.isFloat(value):
+                pass
+            else:
+                reg = r"[\w]+"
+                match = re.search(reg, value)
+                if match:
+                    nome_funcao = match.group()
+                    check_nome_funcao(linha, key, nome_funcao)
+                    value = value.replace(match.group(), "")
+        lista_variaveis.append(res[0])
+    else:
+        st.logWarning(linha, f"sem tratamento")
 
 
 def checkCorpo(linha, corpo, params, tipoRetorno):

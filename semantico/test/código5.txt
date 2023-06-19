@@ -12,9 +12,10 @@ int main(int argc, char *argv[]) //função main
     arg6 = (int) arg1 + (float) arg2 * arg4; //realizacao uma operação
     arg3 = arg2 - arg1 * arg6; //realiza outra operacao
     float operacao = arg1 * arg2 / arg3 - arg4 / arg5 * arg6; //realiza a última operação
+    float operacao = 1.0;
     printf ("%i\n",arg3);
     printf ("%f\n",arg6);
     printf ("%f\n",operacao);
 
-    return 0,5; //finaliza a função main
+    //return 0,5; //finaliza a função main
 }

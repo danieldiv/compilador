@@ -19,7 +19,6 @@ else_condicional = False
 definicao = ""
 parametros = ""
 comparacao = ""
-# chave = ""
 
 
 def initEscopo(linha, expressao):
@@ -87,7 +86,7 @@ def limparFuncao(linha, expressao):
     if endEscopo(linha, expressao):
         expressao = expressao.replace("}", "")
 
-    definicao = re.search(f"{s.reg_tipos.pattern}\w+\s*", expressao).group()
+    definicao = re.search(f"{s.reg_tipos}\w+\s*", expressao).group()
     expressao = expressao.replace(definicao, "")
 
     if "(" in expressao:
@@ -105,7 +104,6 @@ def limparFuncao(linha, expressao):
 def limparCondicional(linha, expressao):
     global condicional
     global comparacao
-    # global chave
 
     condicional = True
 
@@ -121,7 +119,7 @@ def limparCondicional(linha, expressao):
 
     if st.CONDICIONAL in expressao:
         expressao = expressao.replace(st.CONDICIONAL, "").strip()
-        condicional = re.search(f"{s.reg_comparacao.pattern}", expressao).group()
+        condicional = re.search(f"{s.reg_comparacao}", expressao).group()
         expressao = expressao.replace(condicional, "")
         valores = expressao.split()
         comparacao = {

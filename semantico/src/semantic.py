@@ -31,11 +31,13 @@ def printFuncoes():
                 else:
                     condicao = valores[0]
                     corpo_condicao = valores[1]
-                    st.printCondicional("None", condicao)
+                    st.printMessage(condicao)
 
                     for c in corpo_condicao:
                         for key, value in c.items():
-                            st.printCondicional(key, value)
+                            st.logWarning(
+                                key, f"sem tratamento para condicional {value}"
+                            )
         print()
     exit()
 
