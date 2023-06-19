@@ -35,7 +35,9 @@ reg_funcao = re.compile(
 reg_printf = re.compile(
     rf'printf\s?\(("{reg_especificadores}\\n",\s*(\w+)\);|"\w+"\);)'
 )
-reg_return = re.compile(r"return\s?(([\w. ]+)\s?;|\(([\w. ]+)[+|\-|*|/]([\w. ]+)\);)")
+reg_return = re.compile(
+    rf"return\s?(([\w. ]+)\s?;|\(([\w. ]+)({reg_operadores})([\w. ]+)\);)"
+)
 reg_scanf = re.compile(rf'scanf\s?\("{reg_especificadores}",\s?&\w+\)\s?;')
 reg_chaves = re.compile(r"({|})")
 
