@@ -1,49 +1,49 @@
 # Problema proposto
 
-- Ler um arquivo em linguagem C, realizar analise lexica, sintatica e semantica
-- Com o codigo validado, gerar codigo intermediario
-- Apos isso, transformar para python
+- Ler um arquivo em linguagem C, realizar análise lexica, sintática e semântica
+- Com o código validado, gerar código intermediário
+- Após isso, transformar para python
 
-## Lexico
+## Léxico
 
-> Consiste em verificar se os caracteres sao validos, como esta sendo utilizado `regex`, irá aceitar apenas o que esta definido.
+> Consiste em verificar se os caracteres são válidos, como está sendo utilizado `regex`, irá aceitar apenas o que está definido.
 
 ### Tipos de caracteres aceitos
 
-- `\w`: letras maiusculas e minusculas e numeros
-- `()`: parenteses
+- `\w`: letras maiúsculas, minúsculas e números
+- `()`: parênteses
 - `{}`: chaves
-- `//`: comentario
+- `//`: comentário
 - `;`: para fim de linha
-- operadores logicos
-- operadores aritimeticos
+- operadores lógicos
+- operadores aritméticos
 - operador de atribuição
 
-## Sintatico
+## Sintático
 
-> Nesta parte é feita a verifição da expressao, por exemplo, a expressao `int x = "teste";` não é valida, mas faz sentido a sua organização, quem irá validar os tipos entre outras coisas é o semantico.
+> Nesta parte é feita a verificação da expressão, por exemplo, a expressão `int x = "teste";` não é valida, mas faz sentido a sua organização, quem irá validar os tipos entre outras coisas é o semântico.
 
 ### Funcionamento
 
 - Definição do regex que serão utilizados
 - Abrir arquivo para realizar verificação
-- Para cada linha testar todos os regex, se algum for valido, entao a expressao é valida.
+- Para cada linha testar todos os regex, se algum for válido, então a expressão é válida.
 
-## Semantico
+## Semântico
 
-> Necessario para verificar escopo de funcao, tipos de retornos e declarações.a
+> Necessário para verificar escopo de função, tipos de retornos e declarações.
 
-### Validacoes
+### Validações
 
-- Escopo de funcao para declaracao de variaveis
-- Escopo de funcao para declaracao de funcoes
-- Retorno de funcoes para tipo especifico
-- Repetição de variaveis e funcoes
-- Validar tipo de variavel declarada
+- Escopo de função para declaracao de variáveis
+- Escopo de função para declaracao de funções
+- Retorno de funções para tipo especifico
+- Repetição de variáveis e funções
+- Validar tipo de variável declarada
 
 # Funcionamento
 
-> Para melhor organização o codigo foi separado em modulos, sendo eles:
+> Para melhor organização o código foi separado em modulos, sendo eles:
 
 - static
 - sintatic
@@ -56,27 +56,27 @@
 ## Arquivo
 
 - Abrir arquivo `códigoX.txt` localizado em `/teste`
-- Validar sintaticamente o que tambem ja valida lexicamente
+- Validar sintaticamente o que já valida lexicamente
 - Com a validação, adicionar linha lida em uma lista
-- Se linha não for valida, apresentar mensagem de erro indicando sua localização
+- Se a linha não for valida, apresentar mensagem de erro indicando sua localização
 
-## Semantico
+## Semântico
 
-- Separar entradas, adicionando uma na lista de includes e outra na lista de funcoes, cada funcao possui sua lista de escopo.
+- Separar entradas, adicionando uma na lista de includes e outra na lista de funções, cada função possui sua lista de escopo.
 
 ## Escopo
 
-> Existem dois tipos de escopo, sendo o primeiro o da funcao e o segundo o escopo da condicional, que so pode existir dentro do escopo da funcao.
+> Existem dois tipos de escopo, sendo o primeiro o da função e o segundo o escopo da condicional, que só pode existir dentro do escopo da função.
 
 - O escopo inicia com `{` e finaliza com `}`.
 
 ## Parameters
 
-> O escopo da funcao pode possuir variaveis nos parametros, portanto é necessario avaliar a validar antes de entrar no corpo da funcao.a
+> O escopo da função pode possuir variáveis nos parâmetros, portanto é necessário avaliar a validar antes de entrar no corpo da função.
 
 ## Body (corpo)
 
-> Todo o corpo da funcao é uma lista com informação sobre a linha e conteudo. Estruturas condicionas tambem ficam na lista do corpo, porem de maneira diferente.
+> Todo o corpo da função é uma lista com informação sobre a linha e conteúdo. Estruturas condicionais também ficam na lista do corpo, porém de maneira diferente.
 
 ## Return
 
@@ -86,12 +86,12 @@
 
 ## Observações
 
-> O arquivo `static.py` contem funcoes e variaveis fixas para serem utilizadas em todo o codigo.
+> O arquivo `static.py` contem funções e variáveis fixas para serem utilizadas em todo o código.
 
 - Criação dos `regexs`
-- Revalidacao dos `regexs` para atender o codigo fornecido pelo professor
-- Complexidade de validaçoes, sendo necessario criar varios modulos
-- Como a estrutura condicional é diferente de um escopo comum, ela não tratada `semanticamente`.
+- Revalidação dos `regexs` para atender o código fornecido pelo professor
+- Complexidade de validações, sendo necessário criar vários módulos
+- Como a estrutura condicional é diferente de um escopo comum, ela não é tratada `semanticamente`.
 
 ## Transpilar de C para Python
 
