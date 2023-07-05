@@ -82,9 +82,7 @@
 
 > Realiza a verificação da validade do retorno
 
-## Dificuldades
-
-## Observações
+## Dificuldades e  Observações
 
 > O arquivo `static.py` contem funções e variáveis fixas para serem utilizadas em todo o código.
 
@@ -92,7 +90,8 @@
 - Revalidação dos `regexs` para atender o código fornecido pelo professor
 - Complexidade de validações, sendo necessário criar vários módulos
 - Como a estrutura condicional é diferente de um escopo comum, ela não é tratada `semanticamente`.
+- Múltiplas operações não são tratadas.
 
 ## Transpilar de C para Python
 
-> Pelo tempo 
+> Se houver tempo hábil, faremos. 
