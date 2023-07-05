@@ -40,3 +40,59 @@
 - Retorno de funcoes para tipo especifico
 - Repetição de variaveis e funcoes
 - Validar tipo de variavel declarada
+
+# Funcionamento
+
+> Para melhor organização o codigo foi separado em modulos, sendo eles:
+
+- static
+- sintatic
+- main
+- semantico
+- scope
+- parameters
+
+
+## Arquivo
+
+- Abrir arquivo `códigoX.txt` localizado em `/teste`
+- Validar sintaticamente o que tambem ja valida lexicamente
+- Com a validação, adicionar linha lida em uma lista
+- Se linha não for valida, apresentar mensagem de erro indicando sua localização
+
+## Semantico
+
+- Separar entradas, adicionando uma na lista de includes e outra na lista de funcoes, cada funcao possui sua lista de escopo.
+
+## Escopo
+
+> Existem dois tipos de escopo, sendo o primeiro o da funcao e o segundo o escopo da condicional, que so pode existir dentro do escopo da funcao.
+
+- O escopo inicia com `{` e finaliza com `}`.
+
+## Parameters
+
+> O escopo da funcao pode possuir variaveis nos parametros, portanto é necessario avaliar a validar antes de entrar no corpo da funcao.a
+
+## Body (corpo)
+
+> Todo o corpo da funcao é uma lista com informação sobre a linha e conteudo. Estruturas condicionas tambem ficam na lista do corpo, porem de maneira diferente.
+
+## Return
+
+> Realiza a verificação da validade do retorno
+
+## Dificuldades
+
+## Observações
+
+> O arquivo `static.py` contem funcoes e variaveis fixas para serem utilizadas em todo o codigo.
+
+- Criação dos `regexs`
+- Revalidacao dos `regexs` para atender o codigo fornecido pelo professor
+- Complexidade de validaçoes, sendo necessario criar varios modulos
+- Como a estrutura condicional é diferente de um escopo comum, ela não tratada `semanticamente`.
+
+## Transpilar de C para Python
+
+> Pelo tempo 
