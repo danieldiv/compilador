@@ -8,7 +8,7 @@ reg_include = re.compile(r"#include\s?(<{1}(\w*).h>{1}|\"{1}(\w*).h\"{1})")
 
 reg_tipos = re.compile(r"(int|float|double|char|void)\s+").pattern
 reg_especificadores = re.compile(r"(%d|%i|%f|%lf|%s)").pattern
-reg_cast = re.compile(r"\(\s?(int|float|double|char|void)\s?\)\s?").pattern
+reg_cast = re.compile(r"\(\s?(int|float|double|char|void|bool)\s?\)\s?").pattern
 reg_operadores = re.compile(r"(\+|\-|\*|\/|\%|\+\+|\-\-)\s?").pattern
 reg_comparacao = re.compile(r"(\<|\>|\<=|\>=|==|\!=)\s?").pattern
 reg_args = re.compile(r"(int\sargc,\s?char\s\*argv\[\]|void)\s?").pattern
@@ -36,7 +36,9 @@ reg_printf = re.compile(
     rf'printf\s?\(("{reg_especificadores}\\n",\s*(\w+)\);|"\w+"\);)'
 )
 reg_return = re.compile(
-    rf"return\s?(([\w. ]+)\s?;|\(([\w. ]+)({reg_operadores})([\w. ]+)\);)"
+    r"return\s?(([\w. ]+)\s?;|"
+    rf"\(([\w. ]+)({reg_operadores})([\w. ]+)\);|"
+    rf"([\w. ]+)({reg_operadores})([\w. ]+);)"
 )
 reg_scanf = re.compile(rf'scanf\s?\("{reg_especificadores}",\s?&\w+\)\s?;')
 reg_chaves = re.compile(r"({|})")

@@ -17,5 +17,5 @@ int main(int argc, char *argv[]) //função main
     printf ("%f\n",arg6);
     printf ("%f\n",operacao);
 
-    //return 0,5; //finaliza a função main
+    return 0,5; //finaliza a função main
 }

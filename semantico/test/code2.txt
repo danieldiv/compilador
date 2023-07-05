@@ -2,10 +2,12 @@
 #include "teste.h"
 #include<stdlib.h>
 
-//int x = 15;
+
+//test
 
 int soma(int a, int d)
 {
+    int x = 15;
     int l = 6;
     int f = 3;
     return d;
@@ -32,10 +34,6 @@ int subtrair(int x, int y) {
     return (x-y);
 }
 
-int multiplicar (int a, int b) {
-    return (a*b);
-}
-
 //float dividir2 (float a) {
     //return 25.0;
 //}
@@ -46,6 +44,11 @@ float dividir (float a, float b) {
     int i = 0;
     int j = 5;
     return (a/b);
+}
+
+int multiplicar (int a, int b) {
+    float f = dividir(a,b);
+    return (a*b);
 }
 
 void funcaoVazia() {

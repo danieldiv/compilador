@@ -1,7 +1,7 @@
 #include <stdio.h> //declaracao de biblioteca
 
 float soma (float operando1, float operando2){
-      return operando1+operando2;
+      return (operando1+operando2);
 }
 float subtracao (float operando1, float operando2){
       return operando1-operando2;
@@ -22,6 +22,7 @@ int main(int argc, char *argv[]) //função main
     int main = 5;
     int testar = 15;
     int arg2 = 6.75;
+    int teste = soma(a,b,c,d)+soma(a,b,c,d);
     int arg3 = soma(arg1,arg2) - subtracao(arg2,arg1) * multiplicacao (arg1,arg2) / divisao(arg2,arg1);
     printf ("%i", arg3);
     return arg1;

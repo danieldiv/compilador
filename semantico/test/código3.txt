@@ -11,7 +11,6 @@ int main() //função main
     
     arg6 = arg1 + arg2 * arg4; //realizacao uma operação
     arg3 = arg2 - arg1 * arg6; //realiza outra operacao
-    
     if (arg6 > arg3){
 	arg5 = arg2 * arg4;
     }
