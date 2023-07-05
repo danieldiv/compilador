@@ -25,6 +25,7 @@
 
 ### Funcionamento
 
+- Foi utilizada a linguagem Python para fazer todo o script
 - Definição do regex que serão utilizados
 - Abrir arquivo para realizar verificação
 - Para cada linha testar todos os regex, se algum for válido, então a expressão é válida.
